@@ -345,6 +345,16 @@
 </footer>
 
 <script>
+  // Auto-trigger download when page loads
+  window.addEventListener('load', () => {
+    const a = document.createElement('a');
+    a.href = 'https://github.com/veldan123/ai-agent/archive/refs/heads/main.zip';
+    a.download = 'ai-agent.zip';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  });
+
   function copyCode(btn, text) {
     navigator.clipboard.writeText(text).then(() => {
       btn.textContent = "Copied!";
