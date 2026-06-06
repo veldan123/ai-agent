@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Setup — Client Finder AI</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #0a0a0f; color: #e2e8f0; min-height: 100vh; }
+
+    nav { display: flex; align-items: center; justify-content: space-between; padding: 18px 40px; border-bottom: 1px solid #1e2a3a; }
+    .nav-logo { font-weight: 800; font-size: 1rem; color: #60a5fa; text-decoration: none; }
+    .nav-link  { font-size: 0.85rem; color: #64748b; text-decoration: none; }
+    .nav-link:hover { color: #60a5fa; }
+
+    .hero {
+      text-align: center;
+      padding: 56px 24px 36px;
+      background: radial-gradient(ellipse 70% 50% at 50% 0%, #0e2a4a 0%, #0a0a0f 70%);
+      border-bottom: 1px solid #1e2a3a;
+    }
+    h1 { font-size: clamp(1.8rem, 5vw, 2.6rem); font-weight: 800; letter-spacing: -0.5px; margin-bottom: 12px; color: #f1f5f9; }
+    h1 span { background: linear-gradient(135deg, #60a5fa, #38bdf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .subtitle { color: #64748b; font-size: 0.95rem; max-width: 480px; margin: 0 auto 24px; line-height: 1.6; }
+
+    .os-btns { display: flex; gap: 10px; justify-content: center; }
+    .os-btn { background: #0d1117; border: 1px solid #1e2a3a; color: #64748b; font-size: 0.9rem; font-weight: 600; padding: 10px 22px; border-radius: 99px; cursor: pointer; transition: all 0.15s; }
+    .os-btn.active { background: #1d4ed8; border-color: #1d4ed8; color: #fff; }
+
+    .content { max-width: 640px; margin: 0 auto; padding: 52px 24px 80px; }
+    .os-section { display: none; }
+    .os-section.visible { display: block; }
+
+    .section-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #64748b; margin-bottom: 14px; }
+
+    .components { display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; }
+
+    .comp-row {
+      display: flex; align-items: flex-start; gap: 14px;
+      background: #0d1117; border: 1px solid #1e2a3a;
+      border-radius: 14px; padding: 18px 20px;
+      cursor: pointer; transition: border-color 0.15s;
+      user-select: none;
+    }
+    .comp-row:hover { border-color: #1d4ed8; }
+    .comp-row.disabled { opacity: 0.5; cursor: not-allowed; }
+    .comp-row.disabled:hover { border-color: #1e2a3a; }
+
+    .comp-check {
+      width: 22px; height: 22px; border-radius: 6px;
+      border: 2px solid #334155; background: transparent;
+      flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+      margin-top: 1px; transition: all 0.15s;
+    }
+    .comp-row.checked .comp-check { background: #1d4ed8; border-color: #1d4ed8; }
+    .comp-check svg { display: none; }
+    .comp-row.checked .comp-check svg { display: block; }
+
+    .comp-info { flex: 1; }
+    .comp-name { font-size: 0.95rem; font-weight: 700; color: #f1f5f9; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .comp-desc { font-size: 0.82rem; color: #64748b; line-height: 1.5; }
+
+    .tag { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 5px; }
+    .tag-req    { background: #1e2a3a; color: #60a5fa; }
+    .tag-size   { background: #2a1a0a; color: #fb923c; }
+    .tag-always { background: #0e2a4a; color: #60a5fa; }
+
+    .dl-btn {
+      width: 100%;
+      background: linear-gradient(135deg, #1d4ed8, #2563eb);
+      color: #fff; border: none; border-radius: 14px;
+      padding: 18px 24px; font-size: 1rem; font-weight: 800;
+      cursor: pointer; transition: opacity 0.15s;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+    }
+    .dl-btn:hover { opacity: 0.85; }
+
+    .after-steps { margin-top: 32px; }
+    .step { display: flex; gap: 18px; margin-bottom: 14px; }
+    .step-num { min-width: 36px; height: 36px; background: linear-gradient(135deg, #1d4ed8, #2563eb); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; color: #fff; flex-shrink: 0; }
+    .step-body { background: #0d1117; border: 1px solid #1e2a3a; border-radius: 12px; padding: 16px 20px; flex: 1; }
+    .step-body h3 { font-size: 0.92rem; font-weight: 700; color: #f1f5f9; margin-bottom: 4px; }
+    .step-body p  { font-size: 0.83rem; color: #64748b; line-height: 1.6; }
+    .tip { background: #0d2a0d; border: 1px solid #166534; border-radius: 10px; padding: 12px 16px; font-size: 0.83rem; color: #4ade80; margin-top: 10px; }
+
+    /* ── Warning modal ── */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.8); backdrop-filter: blur(6px);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 100; padding: 24px;
+      opacity: 0; pointer-events: none; transition: opacity 0.2s;
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
+    .modal {
+      background: #0d1117; border: 1px solid #1e2a3a;
+      border-radius: 18px; padding: 36px; max-width: 460px; width: 100%;
+      transform: translateY(16px); transition: transform 0.2s;
+    }
+    .modal-overlay.open .modal { transform: translateY(0); }
+    .modal-icon { font-size: 2.2rem; margin-bottom: 14px; }
+    .modal h2 { font-size: 1.15rem; font-weight: 800; color: #f1f5f9; margin-bottom: 10px; }
+    .modal p { font-size: 0.88rem; color: #64748b; line-height: 1.7; margin-bottom: 6px; }
+    .modal-missing { display: flex; flex-wrap: wrap; gap: 6px; margin: 14px 0; }
+    .modal-pill { background: #2a0a0a; border: 1px solid #7f1d1d; color: #f87171; font-size: 12px; font-weight: 700; padding: 4px 12px; border-radius: 99px; }
+    .modal-btns { display: flex; gap: 10px; margin-top: 22px; }
+    .modal-back { flex: 1; background: #161b22; border: 1px solid #1e2a3a; color: #94a3b8; font-size: 0.88rem; font-weight: 700; padding: 12px; border-radius: 10px; cursor: pointer; transition: all 0.15s; }
+    .modal-back:hover { border-color: #334155; color: #f1f5f9; }
+    .modal-continue { flex: 1; background: #7f1d1d; border: 1px solid #991b1b; color: #fca5a5; font-size: 0.88rem; font-weight: 700; padding: 12px; border-radius: 10px; cursor: pointer; transition: all 0.15s; }
+    .modal-continue:hover { background: #991b1b; color: #fff; }
+
+    footer { text-align: center; padding: 24px; font-size: 12px; color: #334155; border-top: 1px solid #1e2a3a; }
+    footer a { color: #60a5fa; text-decoration: none; }
+  </style>
+</head>
+<body>
+
+<!-- Warning Modal -->
+<div class="modal-overlay" id="warningModal">
+  <div class="modal">
+    <div class="modal-icon">⚠️</div>
+    <h2>Some required components are unchecked</h2>
+    <p>You unchecked the following — the agent <strong>may not work</strong> without them:</p>
+    <div class="modal-missing" id="missingList"></div>
+    <p>If you already have these installed on your computer, that's fine. Otherwise the agent won't start.</p>
+    <div class="modal-btns">
+      <button class="modal-back" onclick="closeWarning()">← Go back</button>
+      <button class="modal-continue" onclick="confirmDownload()">Continue anyway</button>
+    </div>
+  </div>
+</div>
+
+<nav>
+  <a class="nav-logo" href="index.html">← AI Tools</a>
+  <a class="nav-link" href="https://github.com/veldan123/ai-agent" target="_blank">GitHub</a>
+</nav>
+
+<div class="hero">
+  <h1>Set up <span>Client Finder AI</span></h1>
+  <p class="subtitle">Tell it your profession, it figures out who needs your service and finds their contact emails — automatically.</p>
+  <div class="os-btns">
+    <button onclick="showOS('mac')" id="btn-mac" class="os-btn active">🍎 Mac</button>
+    <button onclick="showOS('win')" id="btn-win" class="os-btn">🪟 Windows</button>
+  </div>
+</div>
+
+<div class="content">
+
+<!-- ══ MAC ══ -->
+<div id="os-mac" class="os-section visible">
+
+  <p class="section-label">Choose what to install</p>
+  <div class="components">
+
+    <div class="comp-row checked" id="mac-python" onclick="toggle(this)">
+      <div class="comp-check">
+        <svg width="13" height="13" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="comp-info">
+        <div class="comp-name">Python 3 <span class="tag tag-req">Required</span></div>
+        <div class="comp-desc">The programming language the agent runs on. Uncheck if you already have Python 3 installed.</div>
+      </div>
+    </div>
+
+    <div class="comp-row checked" id="mac-ollama" onclick="toggle(this)">
+      <div class="comp-check">
+        <svg width="13" height="13" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="comp-info">
+        <div class="comp-name">Ollama <span class="tag tag-req">Required</span></div>
+        <div class="comp-desc">Runs the AI locally. Uncheck if Ollama is already installed on your Mac.</div>
+      </div>
+    </div>
+
+    <div class="comp-row checked" id="mac-model" onclick="toggle(this)">
+      <div class="comp-check">
+        <svg width="13" height="13" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="comp-info">
+        <div class="comp-name">AI Model — qwen2.5:7b <span class="tag tag-size">~4 GB</span> <span class="tag tag-req">Required</span></div>
+        <div class="comp-desc">The AI brain. Only downloaded once. Uncheck if you've already pulled qwen2.5:7b in Ollama.</div>
+      </div>
+    </div>
+
+    <div class="comp-row checked disabled">
+      <div class="comp-check">
+        <svg width="13" height="13" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="comp-info">
+        <div class="comp-name">Client Finder Agent <span class="tag tag-always">Always included</span></div>
+        <div class="comp-desc">The AI agent script that finds client contacts — always downloaded and launched.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <button class="dl-btn" onclick="startDownload('mac')">
+    ⬇ &nbsp;Download Installer for Mac
+  </button>
+
+  <div class="after-steps" id="mac-after" style="display:none">
+    <p class="section-label" style="margin-top:32px">After downloading</p>
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <h3>Find the downloaded file</h3>
+        <p>Look in your <strong>Downloads</strong> folder for <strong>install_finder.command</strong>.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <h3>Double-click it</h3>
+        <p>A Terminal window opens and handles everything automatically. The agent will launch and ask what business you're in.</p>
+        <div class="tip">💡 If Mac says "can't be opened" → right-click the file → <strong>Open</strong> → <strong>Open</strong> again.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <h3>Run again anytime</h3>
+        <p>Double-click <strong>install_finder.command</strong> again — it skips setup and launches straight to the agent.</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══ WINDOWS ══ -->
+<div id="os-win" class="os-section">
+
+  <p class="section-label">Choose what to install</p>
+  <div class="components">
+
+    <div class="comp-row checked" id="win-python" onclick="toggle(this)">
+      <div class="comp-check">
+        <svg width="13" height="13" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="comp-info">
+        <div class="comp-name">Python 3 <span class="tag tag-req">Required</span></div>
+        <div class="comp-desc">Needed to run the agent. Uncheck if Python 3 is already installed. Make sure "Add Python to PATH" was ticked during install.</div>
+      </div>
+    </div>
+
+    <div class="comp-row checked" id="win-ollama" onclick="toggle(this)">
+      <div class="comp-check">
+        <svg width="13" height="13" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="comp-info">
+        <div class="comp-name">Ollama <span class="tag tag-req">Required</span></div>
+        <div class="comp-desc">Runs the AI locally. Uncheck if Ollama is already installed on your PC.</div>
+      </div>
+    </div>
+
+    <div class="comp-row checked" id="win-model" onclick="toggle(this)">
+      <div class="comp-check">
+        <svg width="13" height="13" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="comp-info">
+        <div class="comp-name">AI Model — qwen2.5:7b <span class="tag tag-size">~4 GB</span> <span class="tag tag-req">Required</span></div>
+        <div class="comp-desc">The AI brain. Only downloaded once. Uncheck if you've already pulled qwen2.5:7b in Ollama.</div>
+      </div>
+    </div>
+
+    <div class="comp-row checked disabled">
+      <div class="comp-check">
+        <svg width="13" height="13" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="comp-info">
+        <div class="comp-name">Client Finder Agent <span class="tag tag-always">Always included</span></div>
+        <div class="comp-desc">The AI agent script that finds client contacts — always downloaded and launched.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <button class="dl-btn" onclick="startDownload('win')">
+    ⬇ &nbsp;Download Installer for Windows
+  </button>
+
+  <div class="after-steps" id="win-after" style="display:none">
+    <p class="section-label" style="margin-top:32px">After downloading</p>
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <h3>Find the downloaded file</h3>
+        <p>Look in your <strong>Downloads</strong> folder for <strong>install_finder.bat</strong>.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <h3>Double-click it</h3>
+        <p>A window opens and handles everything automatically. The agent will launch and ask what business you're in.</p>
+        <div class="tip">💡 If Windows shows a blue warning screen → click <strong>More info</strong> → <strong>Run anyway</strong>.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <h3>Run again anytime</h3>
+        <p>Double-click <strong>install_finder.bat</strong> again — it skips setup and launches straight to the agent.</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<footer>
+  <a href="index.html">← Back to home</a> &nbsp;·&nbsp;
+  <a href="https://github.com/veldan123/ai-agent" target="_blank">GitHub</a>
+</footer>
+
+<script>
+  let pendingOS = null;
+  const AGENT_URL = "https://raw.githubusercontent.com/veldan123/ai-agent/main/agent.py";
+
+  function showOS(os) {
+    document.getElementById("os-mac").classList.toggle("visible", os === "mac");
+    document.getElementById("os-win").classList.toggle("visible", os === "win");
+    document.getElementById("btn-mac").classList.toggle("active", os === "mac");
+    document.getElementById("btn-win").classList.toggle("active", os === "win");
+  }
+  window.addEventListener("load", () => showOS(navigator.userAgent.includes("Win") ? "win" : "mac"));
+
+  function toggle(row) {
+    if (row.classList.contains("disabled")) return;
+    row.classList.toggle("checked");
+  }
+
+  function startDownload(os) {
+    pendingOS = os;
+    const prefix = os === "mac" ? "mac" : "win";
+    const installPython = document.getElementById(prefix + "-python").classList.contains("checked");
+    const installOllama = document.getElementById(prefix + "-ollama").classList.contains("checked");
+    const installModel  = document.getElementById(prefix + "-model").classList.contains("checked");
+
+    const missing = [];
+    if (!installPython) missing.push("Python 3");
+    if (!installOllama) missing.push("Ollama");
+    if (!installModel)  missing.push("AI Model (qwen2.5:7b)");
+
+    if (missing.length > 0) {
+      document.getElementById("missingList").innerHTML = missing.map(m => `<span class="modal-pill">${m}</span>`).join("");
+      document.getElementById("warningModal").classList.add("open");
+    } else {
+      doDownload(os, installPython, installOllama, installModel);
+    }
+  }
+
+  function closeWarning() {
+    document.getElementById("warningModal").classList.remove("open");
+    pendingOS = null;
+  }
+
+  function confirmDownload() {
+    document.getElementById("warningModal").classList.remove("open");
+    const os = pendingOS;
+    const prefix = os === "mac" ? "mac" : "win";
+    doDownload(
+      os,
+      document.getElementById(prefix + "-python").classList.contains("checked"),
+      document.getElementById(prefix + "-ollama").classList.contains("checked"),
+      document.getElementById(prefix + "-model").classList.contains("checked")
+    );
+  }
+
+  function doDownload(os, python, ollama, model) {
+    const script   = os === "mac" ? buildMac(python, ollama, model) : buildWin(python, ollama, model);
+    const filename = os === "mac" ? "install_finder.command" : "install_finder.bat";
+    const blob = new Blob([script], { type: "text/plain" });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement("a");
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    const afterEl = document.getElementById(os + "-after");
+    afterEl.style.display = "block";
+    afterEl.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function buildMac(python, ollama, model) {
+    let s = `#!/bin/bash\nclear\necho ""\necho "  ╔══════════════════════════════════╗"\necho "  ║   Client Finder AI — Setup       ║"\necho "  ╚══════════════════════════════════╝"\necho ""\n\n`;
+
+    if (python) {
+      s += `# ── Homebrew ──\nif ! command -v brew &>/dev/null; then\n    echo "  Installing Homebrew..."\n    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"\n    [ -f /opt/homebrew/bin/brew ] && eval "$(/opt/homebrew/bin/brew shellenv)"\nfi\n\n# ── Python ──\nif ! command -v python3 &>/dev/null; then\n    echo "  Installing Python..."\n    brew install python3\nfi\necho "  ✓ Python: $(python3 --version)"\n\n`;
+    }
+
+    if (ollama) {
+      s += `# ── Ollama ──\nif ! command -v ollama &>/dev/null; then\n    echo "  Installing Ollama..."\n    brew install ollama\nfi\necho "  ✓ Ollama ready"\n\n`;
+    }
+
+    s += `# ── Start Ollama ──\necho "  Starting Ollama..."\npkill ollama 2>/dev/null; sleep 1\nollama serve &>/dev/null &\nsleep 3\n\n`;
+
+    if (model) {
+      s += `# ── AI Model ──\necho "  Downloading AI model (~4GB, one-time)..."\nollama pull qwen2.5:7b\necho "  ✓ Model ready"\n\n`;
+    }
+
+    s += `# ── Python packages ──\necho "  Installing packages..."\npython3 -m pip install -q ollama requests beautifulsoup4 rich duckduckgo-search\necho "  ✓ Packages installed"\n\n`;
+    s += `# ── Download agent ──\necho "  Downloading agent..."\nmkdir -p ~/contact_finder\ncurl -fsSL "${AGENT_URL}" -o ~/contact_finder/agent.py\necho "  ✓ Agent ready"\n\n`;
+    s += `echo ""\necho "  ✓ Done! Launching Client Finder..."\necho ""\npython3 ~/contact_finder/agent.py\n`;
+    return s;
+  }
+
+  function buildWin(python, ollama, model) {
+    let s = `@echo off\ntitle Client Finder AI Setup\ncls\necho.\necho   =====================================\necho   Client Finder AI Setup\necho   =====================================\necho.\n\n`;
+
+    if (python) {
+      s += `:: ── Python ──\npython --version >nul 2>&1\nif errorlevel 1 (\n    echo   Python not found. Opening download page...\n    start https://www.python.org/downloads/\n    echo   Install Python, check "Add Python to PATH", then re-run this file.\n    pause\n    exit /b 1\n)\necho   ✓ Python found\n\n`;
+    }
+
+    if (ollama) {
+      s += `:: ── Ollama ──\nollama --version >nul 2>&1\nif errorlevel 1 (\n    echo   Ollama not found. Opening download page...\n    start https://ollama.com/download\n    echo   Install Ollama, then re-run this file.\n    pause\n    exit /b 1\n)\necho   ✓ Ollama found\n\n`;
+    }
+
+    s += `:: ── Start Ollama ──\necho   Starting Ollama...\ntaskkill /f /im "ollama.exe" >nul 2>&1\ntimeout /t 1 /nobreak >nul\nstart /b ollama serve\ntimeout /t 4 /nobreak >nul\n\n`;
+
+    if (model) {
+      s += `:: ── AI Model ──\necho   Downloading AI model (~4GB, one-time)...\nollama pull qwen2.5:7b\necho   ✓ Model ready\n\n`;
+    }
+
+    s += `:: ── Packages ──\necho   Installing packages...\npython -m pip install -q ollama requests beautifulsoup4 rich duckduckgo-search\necho   ✓ Packages installed\n\n`;
+    s += `:: ── Download agent ──\necho   Downloading agent...\nif not exist "%USERPROFILE%\\contact_finder" mkdir "%USERPROFILE%\\contact_finder"\ncurl -fsSL "${AGENT_URL}" -o "%USERPROFILE%\\contact_finder\\agent.py"\necho   ✓ Agent ready\n\n`;
+    s += `echo.\necho   ✓ Done! Launching Client Finder...\necho.\npython "%USERPROFILE%\\contact_finder\\agent.py"\npause\n`;
+    return s;
+  }
+</script>
+</body>
+</html>
