@@ -8,7 +8,7 @@ try:
 except ImportError:
     HAS_DDG = False
 
-VERSION     = "1.5.0"
+VERSION     = "1.5.1"
 VERSION_URL = "https://raw.githubusercontent.com/veldan123/ai-agent/main/chatbot_app/version.txt"
 APP_URL     = "https://raw.githubusercontent.com/veldan123/ai-agent/main/chatbot_app/chatbot_app.py"
 APP_PATH    = os.path.expanduser("~/chatbot_app/chatbot_app.py")
@@ -588,6 +588,11 @@ async function sendMsg(text) {
         if(d==='[DONE]') break;
         try {
           const obj = JSON.parse(d);
+          if(obj.error) {
+            cursor.remove();
+            aiBubble.textContent = '⚠ ' + obj.error;
+            return;
+          }
           if(obj.content) {
             full += obj.content;
             cursor.remove();
