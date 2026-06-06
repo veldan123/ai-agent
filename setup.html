@@ -235,6 +235,22 @@
       border-top: 1px solid #1e2a3a;
     }
     footer a { color: #60a5fa; text-decoration: none; }
+
+    .os-btn {
+      background: #0d1117;
+      border: 1px solid #1e2a3a;
+      color: #64748b;
+      font-size: 0.9rem;
+      font-weight: 600;
+      padding: 10px 22px;
+      border-radius: 99px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .os-btn.active { background: #2563eb; border-color: #2563eb; color: #fff; }
+
+    .os-section { display: none; }
+    .os-section.visible { display: block; }
   </style>
 </head>
 <body>
@@ -247,10 +263,17 @@
 <div class="hero">
   <div class="download-badge">✓ Download started</div>
   <h1>Now let's get you <span>set up</span></h1>
-  <p class="subtitle">Follow these 5 steps and you'll be finding clients in under 10 minutes.</p>
+  <p class="subtitle">Follow these steps and you'll be finding clients in under 10 minutes.</p>
+  <div style="margin-top:24px;display:flex;gap:10px;justify-content:center;">
+    <button onclick="showOS('mac')"   id="btn-mac" class="os-btn active">🍎 Mac</button>
+    <button onclick="showOS('win')"   id="btn-win" class="os-btn">🪟 Windows</button>
+  </div>
 </div>
 
 <div class="content">
+
+<!-- ── MAC STEPS ── -->
+<div id="os-mac" class="os-section visible">
 
   <!-- Step 1 -->
   <div class="step">
@@ -337,6 +360,83 @@
     <div class="run-command">python3 ~/Downloads/ai-agent-main/agent.py</div>
   </div>
 
+</div><!-- end os-mac -->
+
+<!-- ── WINDOWS STEPS ── -->
+<div id="os-win" class="os-section">
+
+  <div class="step">
+    <div class="step-left"><div class="step-num">1</div><div class="step-line"></div></div>
+    <div class="step-body">
+      <h3>Unzip the downloaded file</h3>
+      <p>Find <strong>ai-agent-main.zip</strong> in your Downloads folder. Right-click it → <strong>Extract All</strong>. You'll get a folder called <strong>ai-agent-main</strong>.</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-left"><div class="step-num">2</div><div class="step-line"></div></div>
+    <div class="step-body">
+      <h3>Install Python <span class="tag tag-once">One-time</span></h3>
+      <p>Go to <strong>python.org/downloads</strong> and download Python. During install, make sure to tick <strong>"Add Python to PATH"</strong> before clicking Install.</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-left"><div class="step-num">3</div><div class="step-line"></div></div>
+    <div class="step-body">
+      <h3>Install Ollama <span class="tag tag-free">Free</span> <span class="tag tag-once">One-time</span></h3>
+      <p>Download and install the Ollama Windows app. After installing, open <strong>Command Prompt</strong> and run:</p>
+      <a class="ollama-link" href="https://ollama.com/download" target="_blank">⬇ Download Ollama</a>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-left"><div class="step-num">4</div><div class="step-line"></div></div>
+    <div class="step-body">
+      <h3>Download the AI model <span class="tag tag-once">One-time · ~4GB</span></h3>
+      <p>Open <strong>Command Prompt</strong> (press Windows key, type cmd, press Enter) and run:</p>
+      <div class="code-block">
+        <code>ollama pull qwen2.5:7b</code>
+        <button class="copy-btn" onclick="copyCode(this, 'ollama pull qwen2.5:7b')">Copy</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-left"><div class="step-num">5</div><div class="step-line"></div></div>
+    <div class="step-body">
+      <h3>Install dependencies <span class="tag tag-once">One-time</span></h3>
+      <p>In Command Prompt, navigate to the unzipped folder:</p>
+      <div class="code-block">
+        <code>cd %USERPROFILE%\Downloads\ai-agent-main</code>
+        <button class="copy-btn" onclick="copyCode(this, 'cd %USERPROFILE%\\Downloads\\ai-agent-main')">Copy</button>
+      </div>
+      <div class="code-block">
+        <code>python -m pip install -r requirements.txt</code>
+        <button class="copy-btn" onclick="copyCode(this, 'python -m pip install -r requirements.txt')">Copy</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-left"><div class="step-num">6</div></div>
+    <div class="step-body">
+      <h3>Run the agent</h3>
+      <div class="code-block">
+        <code>python agent.py</code>
+        <button class="copy-btn" onclick="copyCode(this, 'python agent.py')">Copy</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="done-box">
+    <h2>You're all set!</h2>
+    <p>Every time you want to use the agent, open Command Prompt and run:</p>
+    <div class="run-command">python %USERPROFILE%\Downloads\ai-agent-main\agent.py</div>
+  </div>
+
+</div><!-- end os-win -->
+
 </div>
 
 <footer>
@@ -345,8 +445,26 @@
 </footer>
 
 <script>
+  // Auto-detect OS and show correct tab
+  function detectOS() {
+    const ua = navigator.userAgent;
+    if (ua.includes("Win")) return "win";
+    return "mac";
+  }
+
+  function showOS(os) {
+    document.getElementById("os-mac").classList.toggle("visible", os === "mac");
+    document.getElementById("os-win").classList.toggle("visible", os === "win");
+    document.getElementById("btn-mac").classList.toggle("active", os === "mac");
+    document.getElementById("btn-win").classList.toggle("active", os === "win");
+  }
+
   // Auto-trigger download when page loads
   window.addEventListener('load', () => {
+    // Set correct OS tab
+    showOS(detectOS());
+
+    // Trigger download
     const a = document.createElement('a');
     a.href = 'https://github.com/veldan123/ai-agent/archive/refs/heads/main.zip';
     a.download = 'ai-agent.zip';

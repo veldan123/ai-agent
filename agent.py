@@ -492,14 +492,24 @@ def gather_contacts(client_types: list, location: str, site_limit: int = 50, ext
 
 # ── Save & copy helpers ───────────────────────────────────────────────────────
 
-import csv, io, subprocess, os
+import csv, io, subprocess, os, sys, platform
 from datetime import datetime
+
+
+def get_save_dir() -> str:
+    """Returns the folder where results are saved, works on Mac and Windows."""
+    if platform.system() == "Windows":
+        base = os.path.join(os.path.expanduser("~"), "Documents", "contact_finder")
+    else:
+        base = os.path.expanduser("~/contact_finder")
+    os.makedirs(base, exist_ok=True)
+    return base
 
 
 def save_csv(contacts: list, profession: str, location: str) -> str:
     ts = datetime.now().strftime("%Y%m%d_%H%M%S")
     safe = re.sub(r"[^a-z0-9]+", "_", f"{profession}_{location}".lower())
-    path = os.path.expanduser(f"~/contact_finder/results_{safe}_{ts}.csv")
+    path = os.path.join(get_save_dir(), f"results_{safe}_{ts}.csv")
     with open(path, "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=["#","client_type","company","email","phone","source"])
         writer.writeheader()
@@ -514,8 +524,15 @@ def copy_to_clipboard(contacts: list):
     writer.writeheader()
     for c in contacts:
         writer.writerow({k: c.get(k, "") for k in ["client_type","company","email","phone","source"]})
+    text = buf.getvalue()
     try:
-        subprocess.run(["pbcopy"], input=buf.getvalue().encode(), check=True)
+        if platform.system() == "Windows":
+            subprocess.run(["clip"], input=text.encode("utf-16"), check=True)
+        elif platform.system() == "Darwin":
+            subprocess.run(["pbcopy"], input=text.encode(), check=True)
+        else:
+            # Linux
+            subprocess.run(["xclip", "-selection", "clipboard"], input=text.encode(), check=True)
         return True
     except Exception:
         return False
