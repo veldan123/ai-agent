@@ -233,13 +233,28 @@
     searches the web, and hands you a list of real business emails — ready to send.
   </p>
   <div class="hero-btns">
-    <a class="btn-download" href="https://github.com/veldan123/ai-agent/archive/refs/heads/main.zip" download>
+    <a class="btn-download" href="#" onclick="handleDownload(event)">
       ⬇ Download for Mac
     </a>
     <a class="btn-secondary" href="https://github.com/veldan123/ai-agent" target="_blank">
       ★ View on GitHub
     </a>
   </div>
+
+  <script>
+    function handleDownload(e) {
+      e.preventDefault();
+      // Trigger the zip download
+      const a = document.createElement('a');
+      a.href = 'https://github.com/veldan123/ai-agent/archive/refs/heads/main.zip';
+      a.download = '';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      // Open setup page
+      window.location.href = 'setup.html';
+    }
+  </script>
   <p class="free-tag"><span>100% Free</span> — runs on your Mac, no API key, no subscription</p>
 </section>
 
@@ -378,7 +393,7 @@
 <section class="cta">
   <h2>Start finding clients today</h2>
   <p>Free, local, no sign-up required.</p>
-  <a class="btn-download" href="https://github.com/veldan123/ai-agent/archive/refs/heads/main.zip" download>
+  <a class="btn-download" href="#" onclick="handleDownload(event)">
     ⬇ Download for Mac
   </a>
 </section>
