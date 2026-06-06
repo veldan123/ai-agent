@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Client Finder Agent</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #0a0a0f;
+      color: #e2e8f0;
+      min-height: 100vh;
+    }
+
+    /* ── Hero ── */
+    .hero {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 80px 24px 60px;
+      text-align: center;
+      background: radial-gradient(ellipse 80% 60% at 50% 0%, #0e2a4a 0%, #0a0a0f 70%);
+      border-bottom: 1px solid #1e2a3a;
+    }
+
+    .badge {
+      display: inline-block;
+      background: #0e2a4a;
+      border: 1px solid #1d4ed8;
+      color: #60a5fa;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 6px 16px;
+      border-radius: 99px;
+      margin-bottom: 28px;
+    }
+
+    h1 {
+      font-size: clamp(2.4rem, 6vw, 4rem);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -1px;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 50%, #f472b6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .subtitle {
+      font-size: clamp(1rem, 2.5vw, 1.25rem);
+      color: #94a3b8;
+      max-width: 560px;
+      line-height: 1.6;
+      margin-bottom: 40px;
+    }
+
+    .btn-download {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: linear-gradient(135deg, #2563eb, #7c3aed);
+      color: #fff;
+      font-size: 1.05rem;
+      font-weight: 700;
+      padding: 16px 36px;
+      border-radius: 12px;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+      box-shadow: 0 0 30px rgba(99, 102, 241, 0.35);
+    }
+    .btn-download:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 45px rgba(99, 102, 241, 0.5);
+    }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: transparent;
+      color: #94a3b8;
+      font-size: 0.9rem;
+      font-weight: 500;
+      padding: 12px 24px;
+      border-radius: 10px;
+      border: 1px solid #1e2a3a;
+      text-decoration: none;
+      margin-top: 14px;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .btn-secondary:hover { border-color: #60a5fa; color: #60a5fa; }
+
+    .hero-btns { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+
+    .free-tag {
+      margin-top: 18px;
+      font-size: 13px;
+      color: #64748b;
+    }
+    .free-tag span { color: #4ade80; font-weight: 600; }
+
+    /* ── Terminal preview ── */
+    .terminal-wrap {
+      display: flex;
+      justify-content: center;
+      padding: 60px 24px 0;
+    }
+    .terminal {
+      background: #0d1117;
+      border: 1px solid #21262d;
+      border-radius: 14px;
+      width: 100%;
+      max-width: 680px;
+      overflow: hidden;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.6);
+    }
+    .terminal-bar {
+      background: #161b22;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid #21262d;
+    }
+    .dot { width: 12px; height: 12px; border-radius: 50%; }
+    .dot-r { background: #ff5f57; }
+    .dot-y { background: #febc2e; }
+    .dot-g { background: #28c840; }
+    .terminal-title { flex: 1; text-align: center; font-size: 12px; color: #484f58; }
+    .terminal-body { padding: 20px 24px; font-family: "SF Mono", "Fira Code", monospace; font-size: 13.5px; line-height: 1.9; }
+    .c-dim    { color: #484f58; }
+    .c-cyan   { color: #56d4dd; }
+    .c-green  { color: #3fb950; }
+    .c-yellow { color: #e3b341; }
+    .c-pink   { color: #f778ba; }
+    .c-white  { color: #e6edf3; }
+
+    /* ── Features ── */
+    .section { padding: 80px 24px; max-width: 1000px; margin: 0 auto; }
+    .section-title {
+      text-align: center;
+      font-size: clamp(1.6rem, 4vw, 2.2rem);
+      font-weight: 700;
+      margin-bottom: 48px;
+      color: #f1f5f9;
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+    }
+    .feature {
+      background: #0d1117;
+      border: 1px solid #1e2a3a;
+      border-radius: 14px;
+      padding: 28px;
+      transition: border-color 0.2s;
+    }
+    .feature:hover { border-color: #2563eb; }
+    .feature-icon { font-size: 2rem; margin-bottom: 14px; }
+    .feature h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 8px; color: #f1f5f9; }
+    .feature p  { font-size: 0.9rem; color: #64748b; line-height: 1.6; }
+
+    /* ── Steps ── */
+    .steps { display: flex; flex-direction: column; gap: 20px; }
+    .step {
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+      background: #0d1117;
+      border: 1px solid #1e2a3a;
+      border-radius: 14px;
+      padding: 24px 28px;
+    }
+    .step-num {
+      min-width: 36px; height: 36px;
+      background: linear-gradient(135deg, #2563eb, #7c3aed);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 14px; color: #fff;
+      margin-top: 2px;
+    }
+    .step h3 { font-size: 1rem; font-weight: 700; margin-bottom: 6px; color: #f1f5f9; }
+    .step p  { font-size: 0.88rem; color: #64748b; line-height: 1.6; }
+    .step code {
+      display: inline-block;
+      background: #161b22;
+      border: 1px solid #21262d;
+      color: #56d4dd;
+      font-family: "SF Mono", monospace;
+      font-size: 12px;
+      padding: 2px 8px;
+      border-radius: 5px;
+      margin-top: 6px;
+    }
+
+    /* ── CTA ── */
+    .cta {
+      text-align: center;
+      padding: 80px 24px;
+      background: radial-gradient(ellipse 60% 80% at 50% 100%, #0e2a4a 0%, #0a0a0f 70%);
+      border-top: 1px solid #1e2a3a;
+    }
+    .cta h2 { font-size: clamp(1.8rem, 4vw, 2.4rem); font-weight: 800; margin-bottom: 16px; color: #f1f5f9; }
+    .cta p  { color: #64748b; margin-bottom: 36px; font-size: 1rem; }
+
+    footer {
+      text-align: center;
+      padding: 24px;
+      font-size: 12px;
+      color: #334155;
+      border-top: 1px solid #1e2a3a;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Hero ── -->
+<section class="hero">
+  <div class="badge">Free &amp; Open Source</div>
+  <h1>Find Your Next Client<br>With AI</h1>
+  <p class="subtitle">
+    Tell the agent your profession. It figures out who needs your service,
+    searches the web, and hands you a list of real business emails — ready to send.
+  </p>
+  <div class="hero-btns">
+    <a class="btn-download" href="https://github.com/GITHUB_USERNAME/REPO_NAME/archive/refs/heads/main.zip" download>
+      ⬇ Download for Mac
+    </a>
+    <a class="btn-secondary" href="https://github.com/GITHUB_USERNAME/REPO_NAME" target="_blank">
+      ★ View on GitHub
+    </a>
+  </div>
+  <p class="free-tag"><span>100% Free</span> — runs on your Mac, no API key, no subscription</p>
+</section>
+
+<!-- ── Terminal preview ── -->
+<div class="terminal-wrap">
+  <div class="terminal">
+    <div class="terminal-bar">
+      <div class="dot dot-r"></div>
+      <div class="dot dot-y"></div>
+      <div class="dot dot-g"></div>
+      <span class="terminal-title">Client Finder Agent</span>
+    </div>
+    <div class="terminal-body">
+      <div><span class="c-pink">▓▓</span> <span class="c-cyan">CLIENT FINDER AGENT</span> <span class="c-pink">▓▓</span></div>
+      <div><span class="c-dim">Free AI · Powered by Ollama</span></div>
+      <div>&nbsp;</div>
+      <div><span class="c-white">What is your business or profession?</span></div>
+      <div><span class="c-cyan">&gt;</span> <span class="c-white">I do wedding photography in Singapore</span></div>
+      <div>&nbsp;</div>
+      <div><span class="c-cyan">⣾</span> <span class="c-dim">AI is thinking...</span></div>
+      <div>&nbsp;</div>
+      <div><span class="c-green">✓</span>  Wedding Photographer in Singapore</div>
+      <div>&nbsp;</div>
+      <div><span class="c-cyan">⣾</span> <span class="c-dim">Brainstorming potential client types...</span></div>
+      <div>&nbsp;</div>
+      <div><span class="c-green">[✓]</span>  1.  Wedding planners &amp; coordinators</div>
+      <div><span class="c-green">[✓]</span>  2.  Bridal boutiques</div>
+      <div><span class="c-green">[✓]</span>  3.  Wedding venues &amp; hotels</div>
+      <div><span class="c-dim">[  ]</span>  <span class="c-dim">4.  Photography studios</span></div>
+      <div>&nbsp;</div>
+      <div><span class="c-cyan">⣾</span> <span class="c-dim">Scanning websites ████████░░░░ 65% · ETA 0:01:12</span></div>
+      <div>&nbsp;</div>
+      <div><span class="c-green">✓  Found</span> <span class="c-cyan">24</span> <span class="c-green">potential clients!</span></div>
+      <div><span class="c-dim">18 emails  ·  6 phones  ·  Saved to results.csv</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Features ── -->
+<div style="max-width:1000px;margin:0 auto;">
+  <section class="section">
+    <h2 class="section-title">What it does</h2>
+    <div class="features">
+      <div class="feature">
+        <div class="feature-icon">🧠</div>
+        <h3>Thinks like a salesperson</h3>
+        <p>Tell it you're a photographer — it figures out who needs one (wedding planners, real estate agents, cafes) instead of finding other photographers.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">🔍</div>
+        <h3>Dorks the web automatically</h3>
+        <p>Runs dozens of search queries across hundreds of websites to surface publicly available email addresses and phone numbers.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">✉️</div>
+        <h3>Filters junk emails</h3>
+        <p>Removes noreply@, wordpress@, bounce@, and other non-emailable addresses. Only keeps real inboxes someone will actually read.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">📋</div>
+        <h3>Exports to CSV + clipboard</h3>
+        <p>Results saved to a CSV file and copied to your clipboard automatically. Paste straight into Excel, Google Sheets, or your CRM.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">🆓</div>
+        <h3>Completely free</h3>
+        <p>Runs a local AI model via Ollama on your Mac. No API key, no subscription, no data sent to the cloud.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">⚡</div>
+        <h3>You stay in control</h3>
+        <p>Choose which client types to target, how many websites to scan, and add extra filters before the search starts.</p>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ── Steps ── -->
+<div style="background:#080b10;border-top:1px solid #1e2a3a;border-bottom:1px solid #1e2a3a;">
+  <div style="max-width:680px;margin:0 auto;">
+    <section class="section">
+      <h2 class="section-title">How to get started</h2>
+      <div class="steps">
+
+        <div class="step">
+          <div class="step-num">1</div>
+          <div>
+            <h3>Download the files</h3>
+            <p>Click the download button above. Unzip the folder and move it anywhere on your Mac (Desktop is fine).</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">2</div>
+          <div>
+            <h3>Install Ollama (the free AI)</h3>
+            <p>Download the Ollama app from <strong>ollama.com/download</strong> and open it. You'll see a small icon in your menu bar.</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">3</div>
+          <div>
+            <h3>Download the AI model (once)</h3>
+            <p>Open Terminal and run:</p>
+            <code>ollama pull qwen2.5:7b</code>
+            <p style="margin-top:6px;">This downloads the free AI model (~4GB). Only needs to happen once.</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">4</div>
+          <div>
+            <h3>Install Python dependencies</h3>
+            <p>In Terminal, run:</p>
+            <code>python3 -m pip install -r requirements.txt</code>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">5</div>
+          <div>
+            <h3>Run the agent</h3>
+            <p>In Terminal, run:</p>
+            <code>python3 agent.py</code>
+            <p style="margin-top:6px;">Tell it what you do and watch it find clients for you.</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </div>
+</div>
+
+<!-- ── CTA ── -->
+<section class="cta">
+  <h2>Start finding clients today</h2>
+  <p>Free, local, no sign-up required.</p>
+  <a class="btn-download" href="https://github.com/GITHUB_USERNAME/REPO_NAME/archive/refs/heads/main.zip" download>
+    ⬇ Download for Mac
+  </a>
+</section>
+
+<footer>
+  Built with Ollama · Open source on GitHub
+</footer>
+
+</body>
+</html>
