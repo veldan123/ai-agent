@@ -70,6 +70,17 @@
     .tag-always { background: #1a1040; color: #a78bfa; }
 
     /* ── Download button ── */
+    .mac-warning {
+      background: #1c1200; border: 1px solid #854d0e;
+      border-radius: 14px; padding: 18px 20px; margin-bottom: 18px;
+      display: none;
+    }
+    .mac-warning.visible { display: block; }
+    .mac-warning-title { font-size: 0.88rem; font-weight: 800; color: #fbbf24; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+    .mac-warning ol { padding-left: 20px; }
+    .mac-warning li { font-size: 0.83rem; color: #d97706; line-height: 1.9; }
+    .mac-warning li strong { color: #fbbf24; }
+
     .dl-btn {
       width: 100%;
       background: linear-gradient(135deg, #6d28d9, #7c3aed);
@@ -201,6 +212,16 @@
       </div>
     </div>
 
+  </div>
+
+  <div class="mac-warning visible" id="mac-gatekeeper-note">
+    <div class="mac-warning-title">⚠️ Mac will show a security warning — here's what to do</div>
+    <ol>
+      <li>After downloading, find <strong>install_chatbot.command</strong> in your Downloads folder</li>
+      <li><strong>Right-click</strong> the file (not double-click) → click <strong>Open</strong></li>
+      <li>A popup appears — click <strong>Open</strong> again</li>
+      <li>Terminal opens and runs the installer automatically</li>
+    </ol>
   </div>
 
   <button class="dl-btn" onclick="startDownload('mac')">
