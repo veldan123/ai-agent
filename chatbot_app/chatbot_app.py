@@ -8,7 +8,7 @@ try:
 except ImportError:
     HAS_DDG = False
 
-VERSION     = "1.5.2"
+VERSION     = "1.5.3"
 VERSION_URL = "https://raw.githubusercontent.com/veldan123/ai-agent/main/chatbot_app/version.txt"
 APP_URL     = "https://raw.githubusercontent.com/veldan123/ai-agent/main/chatbot_app/chatbot_app.py"
 APP_PATH    = os.path.expanduser("~/chatbot_app/chatbot_app.py")
@@ -555,12 +555,12 @@ async function sendMsg(text) {
       const sr = await fetch('/api/search?q=' + encodeURIComponent(userText));
       const sd = await sr.json();
       if (sd.results && sd.results.length) {
-        let ctx = `You are answering with LIVE web search results fetched right now. Your training data is outdated — you MUST answer using ONLY the search results below. Do not rely on your own knowledge for facts, figures, or current events. If the results don't contain enough information, say so.\n\nSearch results for "${userText}":\n\n`;
+        let ctx = `I just searched the web right now for: "${userText}"\n\nHere are the live search results:\n\n`;
         sd.results.forEach((r,i) => {
-          const tag = r.type === 'news' ? `[NEWS${r.date ? ' '+r.date : ''}]` : '[WEB]';
-          ctx += `${i+1}. ${tag} ${r.title}\n   ${r.url}\n   ${r.body}\n\n`;
+          const tag = r.type === 'news' ? `[NEWS${r.date ? ' — '+r.date : ''}]` : '[WEB]';
+          ctx += `${i+1}. ${tag} ${r.title}\n   Source: ${r.url}\n   ${r.body}\n\n`;
         });
-        ctx += 'Answer the user based strictly on the above results. Cite the source URLs where relevant.';
+        ctx += `---\nUsing ONLY the search results above (not your training data), answer this question: ${userText}`;
         searchCtx = ctx;
       }
     } catch(e) {}
@@ -574,9 +574,9 @@ async function sendMsg(text) {
   streaming = true;
   document.getElementById('sendBtn').disabled = true;
 
-  // Build messages array — prepend search context as system message if available
+  // Build messages: replace the last user message with search context injected into it
   const payload = searchCtx
-    ? [{role:'system', content: searchCtx}, ...msgs]
+    ? [...msgs.slice(0, -1), {role:'user', content: searchCtx}]
     : msgs;
 
   let full = '';
