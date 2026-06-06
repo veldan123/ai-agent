@@ -8,7 +8,7 @@ try:
 except ImportError:
     HAS_DDG = False
 
-VERSION     = "1.5.1"
+VERSION     = "1.5.2"
 VERSION_URL = "https://raw.githubusercontent.com/veldan123/ai-agent/main/chatbot_app/version.txt"
 APP_URL     = "https://raw.githubusercontent.com/veldan123/ai-agent/main/chatbot_app/chatbot_app.py"
 APP_PATH    = os.path.expanduser("~/chatbot_app/chatbot_app.py")
@@ -198,9 +198,15 @@ def web_search():
     if not q:
         return jsonify({"results": []})
     try:
+        results = []
         with DDGS() as ddgs:
-            hits = list(ddgs.text(q, max_results=5))
-        results = [{"title": h["title"], "body": h["body"], "url": h["href"]} for h in hits]
+            for h in ddgs.text(q, max_results=4):
+                results.append({"title": h["title"], "body": h["body"], "url": h["href"], "type": "web"})
+            try:
+                for h in ddgs.news(q, max_results=3):
+                    results.append({"title": h["title"], "body": h["body"], "url": h["url"], "type": "news", "date": h.get("date","")})
+            except Exception:
+                pass
         return jsonify({"results": results})
     except Exception as e:
         return jsonify({"error": str(e), "results": []})
@@ -549,9 +555,12 @@ async function sendMsg(text) {
       const sr = await fetch('/api/search?q=' + encodeURIComponent(userText));
       const sd = await sr.json();
       if (sd.results && sd.results.length) {
-        let ctx = `Web search results for "${userText}":\n\n`;
-        sd.results.forEach((r,i) => { ctx += `${i+1}. ${r.title}\n${r.url}\n${r.body}\n\n`; });
-        ctx += 'Use the above results to answer with up-to-date information. Cite sources when helpful.';
+        let ctx = `You are answering with LIVE web search results fetched right now. Your training data is outdated — you MUST answer using ONLY the search results below. Do not rely on your own knowledge for facts, figures, or current events. If the results don't contain enough information, say so.\n\nSearch results for "${userText}":\n\n`;
+        sd.results.forEach((r,i) => {
+          const tag = r.type === 'news' ? `[NEWS${r.date ? ' '+r.date : ''}]` : '[WEB]';
+          ctx += `${i+1}. ${tag} ${r.title}\n   ${r.url}\n   ${r.body}\n\n`;
+        });
+        ctx += 'Answer the user based strictly on the above results. Cite the source URLs where relevant.';
         searchCtx = ctx;
       }
     } catch(e) {}
