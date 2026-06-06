@@ -8,7 +8,7 @@ try:
 except ImportError:
     HAS_DDG = False
 
-VERSION     = "1.5.3"
+VERSION     = "1.5.4"
 VERSION_URL = "https://raw.githubusercontent.com/veldan123/ai-agent/main/chatbot_app/version.txt"
 APP_URL     = "https://raw.githubusercontent.com/veldan123/ai-agent/main/chatbot_app/chatbot_app.py"
 APP_PATH    = os.path.expanduser("~/chatbot_app/chatbot_app.py")
@@ -374,6 +374,7 @@ textarea::placeholder{color:#475569}
       <div class="sb-user" id="sb-username"></div>
       <button class="logout-btn" onclick="logout()">Sign out</button>
     </div>
+    <div style="padding:6px 14px 10px;font-size:10px;color:#1e2a3a;text-align:right" id="versionLabel"></div>
   </div>
   <div class="main">
     <div class="update-banner" id="updateBanner">
@@ -410,6 +411,7 @@ async function checkForUpdate() {
   try {
     const res = await fetch('/api/check-update');
     const data = await res.json();
+    document.getElementById('versionLabel').textContent = 'v' + data.current;
     if (data.update_available) {
       document.getElementById('updateBanner').style.display = 'flex';
     }
@@ -549,12 +551,19 @@ async function sendMsg(text) {
   // Web search: inject results as system context
   let searchCtx = null;
   if (webOn) {
-    document.getElementById('searchStatus').style.display = 'flex';
+    const statusEl = document.getElementById('searchStatus');
+    statusEl.innerHTML = '<div class="search-dot"></div>Searching the web…';
+    statusEl.style.display = 'flex';
     document.getElementById('sendBtn').disabled = true;
     try {
       const sr = await fetch('/api/search?q=' + encodeURIComponent(userText));
       const sd = await sr.json();
-      if (sd.results && sd.results.length) {
+      if (sd.error && sd.results.length === 0) {
+        statusEl.innerHTML = '⚠ Web search unavailable: ' + sd.error;
+        setTimeout(() => { statusEl.style.display = 'none'; }, 3000);
+      } else if (sd.results && sd.results.length) {
+        statusEl.innerHTML = `✓ Found ${sd.results.length} results`;
+        setTimeout(() => { statusEl.style.display = 'none'; }, 2000);
         let ctx = `I just searched the web right now for: "${userText}"\n\nHere are the live search results:\n\n`;
         sd.results.forEach((r,i) => {
           const tag = r.type === 'news' ? `[NEWS${r.date ? ' — '+r.date : ''}]` : '[WEB]';
@@ -562,9 +571,14 @@ async function sendMsg(text) {
         });
         ctx += `---\nUsing ONLY the search results above (not your training data), answer this question: ${userText}`;
         searchCtx = ctx;
+      } else {
+        statusEl.innerHTML = '⚠ No results found';
+        setTimeout(() => { statusEl.style.display = 'none'; }, 2000);
       }
-    } catch(e) {}
-    document.getElementById('searchStatus').style.display = 'none';
+    } catch(e) {
+      statusEl.innerHTML = '⚠ Search failed';
+      setTimeout(() => { statusEl.style.display = 'none'; }, 2000);
+    }
   }
 
   const aiBubble = addBubble('assistant', '');
