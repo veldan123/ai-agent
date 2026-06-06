@@ -8,7 +8,7 @@ try:
 except ImportError:
     HAS_DDG = False
 
-VERSION     = "1.5.4"
+VERSION     = "1.5.5"
 VERSION_URL = "https://raw.githubusercontent.com/veldan123/ai-agent/main/chatbot_app/version.txt"
 APP_URL     = "https://raw.githubusercontent.com/veldan123/ai-agent/main/chatbot_app/chatbot_app.py"
 APP_PATH    = os.path.expanduser("~/chatbot_app/chatbot_app.py")
@@ -340,6 +340,15 @@ textarea::placeholder{color:#475569}
 .hint{max-width:820px;margin:6px auto 0;font-size:11px;color:#334155;text-align:center}
 .update-banner{background:#1a1200;border-bottom:1px solid #854d0e;padding:9px 20px;font-size:12px;color:#fbbf24;display:none;align-items:center;justify-content:center;gap:10px;text-align:center;line-height:1.5}
 .update-banner code{background:#2a1e00;border:1px solid #854d0e;border-radius:5px;padding:2px 7px;font-size:11px;color:#fcd34d;font-family:'SF Mono','Fira Code',monospace;user-select:all}
+.sources-card{background:#080b12;border:1px solid #1e2a3a;border-radius:12px;padding:10px 14px;margin:2px 20px 0;max-width:780px;width:calc(100% - 40px)}
+.sources-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#334155;margin-bottom:8px}
+.source-item{display:flex;align-items:baseline;gap:8px;padding:5px 0;border-top:1px solid #0d1117}
+.source-item:first-of-type{border-top:none;padding-top:0}
+.source-tag{font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;flex-shrink:0}
+.tag-news{background:#0a1a0a;color:#4ade80}
+.tag-web{background:#0a0f1a;color:#60a5fa}
+.source-link{font-size:11px;color:#64748b;text-decoration:none;line-height:1.4;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.source-link:hover{color:#a78bfa;text-decoration:underline}
 </style>
 </head>
 <body>
@@ -562,14 +571,15 @@ async function sendMsg(text) {
         statusEl.innerHTML = '⚠ Web search unavailable: ' + sd.error;
         setTimeout(() => { statusEl.style.display = 'none'; }, 3000);
       } else if (sd.results && sd.results.length) {
-        statusEl.innerHTML = `✓ Found ${sd.results.length} results`;
-        setTimeout(() => { statusEl.style.display = 'none'; }, 2000);
-        let ctx = `I just searched the web right now for: "${userText}"\n\nHere are the live search results:\n\n`;
-        sd.results.forEach((r,i) => {
-          const tag = r.type === 'news' ? `[NEWS${r.date ? ' — '+r.date : ''}]` : '[WEB]';
-          ctx += `${i+1}. ${tag} ${r.title}\n   Source: ${r.url}\n   ${r.body}\n\n`;
+        statusEl.innerHTML = `✓ Found ${sd.results.length} sources`;
+        setTimeout(() => { statusEl.style.display = 'none'; }, 2500);
+        showSources(sd.results);
+        let ctx = `<context>\n`;
+        sd.results.forEach(r => {
+          const tag = r.type === 'news' ? `[NEWS${r.date ? ' '+r.date : ''}]` : '[WEB]';
+          ctx += `${tag} ${r.title}\nURL: ${r.url}\n${r.body}\n\n`;
         });
-        ctx += `---\nUsing ONLY the search results above (not your training data), answer this question: ${userText}`;
+        ctx += `</context>\n\nUsing ONLY the information in the <context> above (which was fetched live from the web right now), answer this question: ${userText}\n\nIf the context does not contain enough information, say so.`;
         searchCtx = ctx;
       } else {
         statusEl.innerHTML = '⚠ No results found';
@@ -639,6 +649,21 @@ async function sendMsg(text) {
   streaming = false;
   document.getElementById('sendBtn').disabled = false;
   document.getElementById('inp').focus();
+}
+
+// ── Show source cards ──
+function showSources(results) {
+  const el = document.getElementById('msgs');
+  el.querySelector('.empty')?.remove();
+  const card = document.createElement('div');
+  card.className = 'sources-card';
+  card.innerHTML = `<div class="sources-title">🔍 ${results.length} web sources</div>` +
+    results.map(r => `<div class="source-item">
+      <span class="source-tag ${r.type==='news'?'tag-news':'tag-web'}">${r.type==='news'?'NEWS':'WEB'}</span>
+      <a class="source-link" href="${esc(r.url)}" title="${esc(r.title)}">${esc(r.title)}</a>
+    </div>`).join('');
+  el.appendChild(card);
+  el.scrollTop = el.scrollHeight;
 }
 
 // ── Web search toggle ──
