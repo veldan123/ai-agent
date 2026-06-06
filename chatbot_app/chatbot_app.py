@@ -8,7 +8,7 @@ try:
 except ImportError:
     HAS_DDG = False
 
-VERSION     = "1.4.0"
+VERSION     = "1.5.0"
 VERSION_URL = "https://raw.githubusercontent.com/veldan123/ai-agent/main/chatbot_app/version.txt"
 APP_URL     = "https://raw.githubusercontent.com/veldan123/ai-agent/main/chatbot_app/chatbot_app.py"
 APP_PATH    = os.path.expanduser("~/chatbot_app/chatbot_app.py")
@@ -175,6 +175,17 @@ def get_messages(cid):
     c.close()
     return jsonify([dict(r) for r in rows])
 
+# ── Version / update check ──
+@server.route("/api/check-update")
+def check_update_api():
+    try:
+        with urllib.request.urlopen(VERSION_URL, timeout=5) as r:
+            remote = r.read().decode().strip()
+        return jsonify({"current": VERSION, "remote": remote, "update_available": remote != VERSION})
+    except Exception:
+        return jsonify({"current": VERSION, "remote": VERSION, "update_available": False})
+
+
 # ── Web search ──
 @server.route("/api/search")
 def web_search():
@@ -321,6 +332,8 @@ textarea::placeholder{color:#475569}
 .search-dot{width:6px;height:6px;background:#7c3aed;border-radius:50%;animation:pulse 1s ease-in-out infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 .hint{max-width:820px;margin:6px auto 0;font-size:11px;color:#334155;text-align:center}
+.update-banner{background:#1a1200;border-bottom:1px solid #854d0e;padding:9px 20px;font-size:12px;color:#fbbf24;display:none;align-items:center;justify-content:center;gap:10px;text-align:center;line-height:1.5}
+.update-banner code{background:#2a1e00;border:1px solid #854d0e;border-radius:5px;padding:2px 7px;font-size:11px;color:#fcd34d;font-family:'SF Mono','Fira Code',monospace;user-select:all}
 </style>
 </head>
 <body>
@@ -357,6 +370,10 @@ textarea::placeholder{color:#475569}
     </div>
   </div>
   <div class="main">
+    <div class="update-banner" id="updateBanner">
+      ⬆ A new version is available. Re-run the installer to update:&nbsp;
+      <code>curl -fsSL https://raw.githubusercontent.com/veldan123/ai-agent/main/chatbot_app/install_mac.sh | bash</code>
+    </div>
     <div class="messages" id="msgs"></div>
     <div class="input-area">
       <div class="search-status" id="searchStatus"><div class="search-dot"></div>Searching the web…</div>
@@ -379,8 +396,19 @@ async function boot() {
   const data = await res.json();
   if (data.logged_in) showApp(data.username);
   else showLogin();
+  checkForUpdate();
 }
 boot();
+
+async function checkForUpdate() {
+  try {
+    const res = await fetch('/api/check-update');
+    const data = await res.json();
+    if (data.update_available) {
+      document.getElementById('updateBanner').style.display = 'flex';
+    }
+  } catch(e) {}
+}
 
 // ── Auth ──
 function showLogin() {

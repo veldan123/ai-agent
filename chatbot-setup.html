@@ -187,6 +187,7 @@
         <button onclick="copyMacCmd()" id="mac-copy-btn" style="position:absolute;top:10px;right:10px;background:#21262d;border:1px solid #30363d;color:#8b949e;font-size:11px;font-weight:600;padding:4px 10px;border-radius:6px;cursor:pointer;transition:all 0.15s;">Copy</button>
       </div>
       <p>The chatbot window will open automatically when done.</p>
+      <div class="tip" style="margin-top:12px">💡 <strong>Already installed?</strong> Re-run the same command above to update to the latest version. It skips anything already installed and just downloads the newest app.</div>
     </div>
   </div>
 
@@ -234,8 +235,8 @@
         <svg width="13" height="13" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </div>
       <div class="comp-info">
-        <div class="comp-name">AI Model — qwen2.5:7b <span class="tag tag-size">~4 GB</span> <span class="tag tag-req">Required</span></div>
-        <div class="comp-desc">The AI brain. Only downloaded once. Uncheck if you've already pulled qwen2.5:7b in Ollama.</div>
+        <div class="comp-name">AI Model — mistral:7b <span class="tag tag-size">~4 GB</span> <span class="tag tag-req">Required</span></div>
+        <div class="comp-desc">The AI brain. Only downloaded once. Uncheck if you've already pulled mistral:7b in Ollama.</div>
       </div>
     </div>
 
@@ -314,19 +315,15 @@
   function startDownload(os) {
     pendingOS = os;
     const prefix = os === "mac" ? "mac" : "win";
-
     const installPython = document.getElementById(prefix + "-python").classList.contains("checked");
     const installOllama = document.getElementById(prefix + "-ollama").classList.contains("checked");
     const installModel  = document.getElementById(prefix + "-model").classList.contains("checked");
-
     const missing = [];
     if (!installPython) missing.push("Python 3");
     if (!installOllama) missing.push("Ollama");
-    if (!installModel)  missing.push("AI Model (qwen2.5:7b)");
-
+    if (!installModel)  missing.push("AI Model (mistral:7b)");
     if (missing.length > 0) {
-      const list = document.getElementById("missingList");
-      list.innerHTML = missing.map(m => `<span class="modal-pill">${m}</span>`).join("");
+      document.getElementById("missingList").innerHTML = missing.map(m => `<span class="modal-pill">${m}</span>`).join("");
       document.getElementById("warningModal").classList.add("open");
     } else {
       doDownload(os, installPython, installOllama, installModel);
@@ -381,10 +378,10 @@
     s += `# ── Start Ollama ──\necho "  Starting Ollama..."\npkill ollama 2>/dev/null; sleep 1\nollama serve &>/dev/null &\nsleep 3\necho "  ✓ Ollama running"\n\n`;
 
     if (model) {
-      s += `# ── Pull AI model ──\necho "  Downloading AI model (~4GB, one-time)..."\nollama pull qwen2.5:7b\necho "  ✓ Model ready"\n\n`;
+      s += `# ── Pull AI model ──\necho "  Downloading AI model (~4GB, one-time)..."\nollama pull mistral:7b\necho "  ✓ Model ready"\n\n`;
     }
 
-    s += `# ── Install packages ──\necho "  Installing Python packages..."\npython3 -m pip install -q customtkinter ollama\necho "  ✓ Packages installed"\n\n`;
+    s += `# ── Install packages ──\necho "  Installing Python packages..."\npython3 -m pip install -q flask pywebview ollama duckduckgo-search --break-system-packages\necho "  ✓ Packages installed"\n\n`;
     s += `# ── Download app ──\necho "  Downloading chatbot app..."\nmkdir -p ~/chatbot_app\ncurl -fsSL "${APP_URL}" -o ~/chatbot_app/chatbot_app.py\necho "  ✓ App ready"\n\n`;
     s += `echo ""\necho "  ✓ Done! Opening chatbot window..."\necho ""\npython3 ~/chatbot_app/chatbot_app.py\n`;
     return s;
@@ -405,10 +402,10 @@
     s += `:: ── Start Ollama ──\necho   Starting Ollama...\ntaskkill /f /im "ollama.exe" >nul 2>&1\ntimeout /t 1 /nobreak >nul\nstart /b ollama serve\ntimeout /t 4 /nobreak >nul\necho   ✓ Ollama running\n\n`;
 
     if (model) {
-      s += `:: ── Pull model ──\necho   Downloading AI model (~4GB, one-time)...\nollama pull qwen2.5:7b\necho   ✓ Model ready\n\n`;
+      s += `:: ── Pull model ──\necho   Downloading AI model (~4GB, one-time)...\nollama pull mistral:7b\necho   ✓ Model ready\n\n`;
     }
 
-    s += `:: ── Install packages ──\necho   Installing Python packages...\npython -m pip install -q customtkinter ollama\necho   ✓ Packages installed\n\n`;
+    s += `:: ── Install packages ──\necho   Installing Python packages...\npython -m pip install -q flask pywebview ollama duckduckgo-search\necho   ✓ Packages installed\n\n`;
     s += `:: ── Download app ──\necho   Downloading chatbot app...\nif not exist "%USERPROFILE%\\chatbot_app" mkdir "%USERPROFILE%\\chatbot_app"\ncurl -fsSL "${APP_URL}" -o "%USERPROFILE%\\chatbot_app\\chatbot_app.py"\necho   ✓ App ready\n\n`;
     s += `echo.\necho   ✓ Done! Opening chatbot window...\necho.\npython "%USERPROFILE%\\chatbot_app\\chatbot_app.py"\npause\n`;
     return s;
