@@ -15,81 +15,108 @@
 
     .hero {
       text-align: center;
-      padding: 60px 24px 40px;
+      padding: 56px 24px 36px;
       background: radial-gradient(ellipse 70% 50% at 50% 0%, #1a0a3a 0%, #0a0a0f 70%);
       border-bottom: 1px solid #1e2a3a;
     }
-    .download-badge { display: inline-flex; align-items: center; gap: 8px; background: #0d2a0d; border: 1px solid #166534; color: #4ade80; font-size: 13px; font-weight: 600; padding: 8px 18px; border-radius: 99px; margin-bottom: 28px; animation: pulse 2s infinite; }
-    @keyframes pulse { 0%,100%{box-shadow:0 0 0 0 rgba(74,222,128,0.2)} 50%{box-shadow:0 0 0 8px rgba(74,222,128,0)} }
-
-    h1 { font-size: clamp(1.8rem, 5vw, 2.8rem); font-weight: 800; letter-spacing: -0.5px; margin-bottom: 14px; color: #f1f5f9; }
+    h1 { font-size: clamp(1.8rem, 5vw, 2.6rem); font-weight: 800; letter-spacing: -0.5px; margin-bottom: 12px; color: #f1f5f9; }
     h1 span { background: linear-gradient(135deg, #a78bfa, #f472b6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-    .subtitle { color: #64748b; font-size: 1rem; max-width: 500px; margin: 0 auto 24px; line-height: 1.6; }
+    .subtitle { color: #64748b; font-size: 0.95rem; max-width: 480px; margin: 0 auto 24px; line-height: 1.6; }
 
-    .preview-img {
-      display: inline-block;
-      background: #0d1117;
-      border: 1px solid #1e2a3a;
-      border-radius: 16px;
-      padding: 20px 28px;
-      margin-bottom: 28px;
-      font-size: 0.85rem;
-      color: #64748b;
-      font-family: "SF Mono", monospace;
-      text-align: left;
-    }
-    .preview-img .pink { color: #f472b6; }
-    .preview-img .purple { color: #a78bfa; }
-    .preview-img .cyan { color: #56d4dd; }
-    .preview-img .green { color: #4ade80; }
-
-    .os-btns { display: flex; gap: 10px; justify-content: center; margin-top: 8px; }
+    .os-btns { display: flex; gap: 10px; justify-content: center; }
     .os-btn { background: #0d1117; border: 1px solid #1e2a3a; color: #64748b; font-size: 0.9rem; font-weight: 600; padding: 10px 22px; border-radius: 99px; cursor: pointer; transition: all 0.15s; }
     .os-btn.active { background: #6d28d9; border-color: #6d28d9; color: #fff; }
 
-    .content { max-width: 680px; margin: 0 auto; padding: 60px 24px 80px; }
+    .content { max-width: 640px; margin: 0 auto; padding: 52px 24px 80px; }
     .os-section { display: none; }
     .os-section.visible { display: block; }
 
-    .step { display: flex; gap: 20px; margin-bottom: 18px; }
-    .step-left { display: flex; flex-direction: column; align-items: center; }
-    .step-num { min-width: 40px; height: 40px; background: linear-gradient(135deg, #6d28d9, #7c3aed); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 15px; color: #fff; flex-shrink: 0; }
-    .step-line { width: 2px; flex: 1; background: #1e2a3a; margin: 6px 0; min-height: 20px; }
-    .step-body { background: #0d1117; border: 1px solid #1e2a3a; border-radius: 14px; padding: 20px 24px; flex: 1; }
-    .step-body h3 { font-size: 1rem; font-weight: 700; color: #f1f5f9; margin-bottom: 6px; }
-    .step-body p { font-size: 0.88rem; color: #64748b; line-height: 1.7; margin-bottom: 8px; }
-    .step-body p:last-child { margin-bottom: 0; }
-
-    .big-download {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      background: linear-gradient(135deg, #6d28d9, #7c3aed);
-      color: #fff;
-      font-size: 1rem;
-      font-weight: 800;
-      padding: 16px 24px;
-      border-radius: 14px;
-      text-decoration: none;
-      cursor: pointer;
-      border: none;
-      transition: opacity 0.15s;
-      margin-top: 10px;
+    /* ── Component selector ── */
+    .section-label {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 1px; color: #64748b; margin-bottom: 14px;
     }
-    .big-download:hover { opacity: 0.85; }
-    .big-download .dl-icon { font-size: 22px; }
-    .big-download .dl-sub { font-size: 11px; font-weight: 500; opacity: 0.75; margin-top: 2px; }
 
-    .tag { display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 5px; margin-left: 6px; }
-    .tag-once { background: #1e2a3a; color: #60a5fa; }
-    .tag-free { background: #0d2a0d; color: #4ade80; }
-    .tag-auto { background: #1a0a3a; color: #a78bfa; }
+    .components { display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; }
 
-    .done-box { background: linear-gradient(135deg, #0d2a0d, #1a0a3a); border: 1px solid #166534; border-radius: 14px; padding: 28px 30px; text-align: center; margin-top: 40px; }
-    .done-box h2 { font-size: 1.3rem; font-weight: 800; color: #4ade80; margin-bottom: 8px; }
-    .done-box p { color: #64748b; font-size: 0.9rem; margin-bottom: 14px; line-height: 1.6; }
-    .reopen-note { font-size: 0.85rem; color: #64748b; margin-top: 8px; }
-    .reopen-note code { background: #161b22; border: 1px solid #21262d; border-radius: 5px; padding: 2px 8px; font-family: "SF Mono", monospace; font-size: 12px; color: #56d4dd; }
+    .comp-row {
+      display: flex; align-items: flex-start; gap: 14px;
+      background: #0d1117; border: 1px solid #1e2a3a;
+      border-radius: 14px; padding: 18px 20px;
+      cursor: pointer; transition: border-color 0.15s;
+      user-select: none;
+    }
+    .comp-row:hover { border-color: #6d28d9; }
+    .comp-row.disabled { opacity: 0.5; cursor: not-allowed; }
+    .comp-row.disabled:hover { border-color: #1e2a3a; }
+
+    .comp-check {
+      width: 22px; height: 22px; border-radius: 6px;
+      border: 2px solid #334155; background: transparent;
+      flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+      margin-top: 1px; transition: all 0.15s;
+    }
+    .comp-row.checked .comp-check { background: #6d28d9; border-color: #6d28d9; }
+    .comp-check svg { display: none; }
+    .comp-row.checked .comp-check svg { display: block; }
+
+    .comp-info { flex: 1; }
+    .comp-name { font-size: 0.95rem; font-weight: 700; color: #f1f5f9; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .comp-desc { font-size: 0.82rem; color: #64748b; line-height: 1.5; }
+
+    .tag { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 5px; }
+    .tag-req    { background: #1e2a3a; color: #60a5fa; }
+    .tag-size   { background: #2a1a0a; color: #fb923c; }
+    .tag-always { background: #1a1040; color: #a78bfa; }
+
+    /* ── Download button ── */
+    .dl-btn {
+      width: 100%;
+      background: linear-gradient(135deg, #6d28d9, #7c3aed);
+      color: #fff; border: none; border-radius: 14px;
+      padding: 18px 24px; font-size: 1rem; font-weight: 800;
+      cursor: pointer; transition: opacity 0.15s;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+    }
+    .dl-btn:hover { opacity: 0.85; }
+
+    /* ── After download steps ── */
+    .after-steps { margin-top: 32px; }
+    .step { display: flex; gap: 18px; margin-bottom: 14px; }
+    .step-num { min-width: 36px; height: 36px; background: linear-gradient(135deg, #6d28d9, #7c3aed); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; color: #fff; flex-shrink: 0; }
+    .step-body { background: #0d1117; border: 1px solid #1e2a3a; border-radius: 12px; padding: 16px 20px; flex: 1; }
+    .step-body h3 { font-size: 0.92rem; font-weight: 700; color: #f1f5f9; margin-bottom: 4px; }
+    .step-body p  { font-size: 0.83rem; color: #64748b; line-height: 1.6; }
+
+    .tip { background: #0d2a0d; border: 1px solid #166534; border-radius: 10px; padding: 12px 16px; font-size: 0.83rem; color: #4ade80; margin-top: 10px; }
+
+    /* ── Warning modal ── */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.8); backdrop-filter: blur(6px);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 100; padding: 24px;
+      opacity: 0; pointer-events: none; transition: opacity 0.2s;
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
+
+    .modal {
+      background: #0d1117; border: 1px solid #1e2a3a;
+      border-radius: 18px; padding: 36px; max-width: 460px; width: 100%;
+      transform: translateY(16px); transition: transform 0.2s;
+    }
+    .modal-overlay.open .modal { transform: translateY(0); }
+
+    .modal-icon { font-size: 2.2rem; margin-bottom: 14px; }
+    .modal h2 { font-size: 1.15rem; font-weight: 800; color: #f1f5f9; margin-bottom: 10px; }
+    .modal p { font-size: 0.88rem; color: #64748b; line-height: 1.7; margin-bottom: 6px; }
+    .modal-missing { display: flex; flex-wrap: wrap; gap: 6px; margin: 14px 0; }
+    .modal-pill { background: #2a0a0a; border: 1px solid #7f1d1d; color: #f87171; font-size: 12px; font-weight: 700; padding: 4px 12px; border-radius: 99px; }
+    .modal-btns { display: flex; gap: 10px; margin-top: 22px; }
+    .modal-back { flex: 1; background: #161b22; border: 1px solid #1e2a3a; color: #94a3b8; font-size: 0.88rem; font-weight: 700; padding: 12px; border-radius: 10px; cursor: pointer; transition: all 0.15s; }
+    .modal-back:hover { border-color: #334155; color: #f1f5f9; }
+    .modal-continue { flex: 1; background: #7f1d1d; border: 1px solid #991b1b; color: #fca5a5; font-size: 0.88rem; font-weight: 700; padding: 12px; border-radius: 10px; cursor: pointer; transition: all 0.15s; }
+    .modal-continue:hover { background: #991b1b; color: #fff; }
 
     footer { text-align: center; padding: 24px; font-size: 12px; color: #334155; border-top: 1px solid #1e2a3a; }
     footer a { color: #a78bfa; text-decoration: none; }
@@ -97,24 +124,29 @@
 </head>
 <body>
 
+<!-- Warning Modal -->
+<div class="modal-overlay" id="warningModal">
+  <div class="modal">
+    <div class="modal-icon">⚠️</div>
+    <h2>Some required components are unchecked</h2>
+    <p>You unchecked the following — the chatbot <strong>may not work</strong> without them:</p>
+    <div class="modal-missing" id="missingList"></div>
+    <p>If you already have these installed on your computer, that's fine. Otherwise the app won't start.</p>
+    <div class="modal-btns">
+      <button class="modal-back" onclick="closeWarning()">← Go back</button>
+      <button class="modal-continue" onclick="confirmDownload()">Continue anyway</button>
+    </div>
+  </div>
+</div>
+
 <nav>
   <a class="nav-logo" href="index.html">← AI Tools</a>
   <a class="nav-link" href="https://github.com/veldan123/ai-agent" target="_blank">GitHub</a>
 </nav>
 
 <div class="hero">
-  <div class="download-badge">🖥 Desktop App — No Browser Needed</div>
   <h1>Set up your <span>AI Chatbot</span></h1>
-  <p class="subtitle">A real desktop app window — like ChatGPT, but running 100% on your computer. No internet, no API key, completely private.</p>
-
-  <div class="preview-img">
-    <span class="purple">●</span> <span class="pink">●</span> <span style="color:#22c55e">●</span> &nbsp; AI Chatbot<br><br>
-    &nbsp;&nbsp;<span class="pink">AI</span><br>
-    &nbsp;&nbsp;<span style="color:#e2e8f0">Hello! I'm your local AI assistant. Ask me anything.</span><br><br>
-    &nbsp;&nbsp;<span class="purple">You</span><br>
-    &nbsp;&nbsp;<span style="color:#e2e8f0">Write me a business email...</span>
-  </div>
-
+  <p class="subtitle">A real desktop app — like ChatGPT, running privately on your computer. Pick what you need to install.</p>
   <div class="os-btns">
     <button onclick="showOS('mac')" id="btn-mac" class="os-btn active">🍎 Mac</button>
     <button onclick="showOS('win')" id="btn-win" class="os-btn">🪟 Windows</button>
@@ -123,90 +155,148 @@
 
 <div class="content">
 
-<!-- MAC -->
+<!-- ══ MAC ══ -->
 <div id="os-mac" class="os-section visible">
 
-  <div class="step">
-    <div class="step-left"><div class="step-num">1</div><div class="step-line"></div></div>
-    <div class="step-body">
-      <h3>Download the files</h3>
-      <p>Click below to download. Then find <strong>ai-agent-main.zip</strong> in your Downloads folder and double-click to unzip it.</p>
-      <a class="big-download" href="https://github.com/veldan123/ai-agent/archive/refs/heads/main.zip">
-        <div class="dl-icon">⬇</div>
-        <div>
-          <div>Download for Mac</div>
-          <div class="dl-sub">ai-agent-main.zip</div>
-        </div>
-      </a>
+  <p class="section-label">Choose what to install</p>
+  <div class="components">
+
+    <div class="comp-row checked" id="mac-python" onclick="toggle(this)">
+      <div class="comp-check">
+        <svg width="13" height="13" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="comp-info">
+        <div class="comp-name">Python 3 <span class="tag tag-req">Required</span></div>
+        <div class="comp-desc">The programming language the chatbot runs on. Uncheck if you already have Python 3 installed.</div>
+      </div>
     </div>
+
+    <div class="comp-row checked" id="mac-ollama" onclick="toggle(this)">
+      <div class="comp-check">
+        <svg width="13" height="13" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="comp-info">
+        <div class="comp-name">Ollama <span class="tag tag-req">Required</span></div>
+        <div class="comp-desc">Runs the AI locally. Uncheck if Ollama is already installed on your Mac.</div>
+      </div>
+    </div>
+
+    <div class="comp-row checked" id="mac-model" onclick="toggle(this)">
+      <div class="comp-check">
+        <svg width="13" height="13" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="comp-info">
+        <div class="comp-name">AI Model — qwen2.5:7b <span class="tag tag-size">~4 GB</span> <span class="tag tag-req">Required</span></div>
+        <div class="comp-desc">The AI brain. Only downloaded once. Uncheck if you've already pulled qwen2.5:7b in Ollama.</div>
+      </div>
+    </div>
+
+    <div class="comp-row checked disabled">
+      <div class="comp-check">
+        <svg width="13" height="13" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="comp-info">
+        <div class="comp-name">Chatbot App <span class="tag tag-always">Always included</span></div>
+        <div class="comp-desc">The chatbot window itself — always downloaded and launched.</div>
+      </div>
+    </div>
+
   </div>
 
-  <div class="step">
-    <div class="step-left"><div class="step-num">2</div></div>
-    <div class="step-body">
-      <h3>Double-click the installer <span class="tag tag-auto">Installs everything automatically</span></h3>
-      <p>Open the unzipped folder → go into <strong>chatbot_app</strong> → double-click <strong>install_mac.command</strong>.</p>
-      <p>A Terminal window will open and handle everything — Python, Ollama, AI model download, and launching the app. First run takes ~5–10 minutes.</p>
-      <div style="background:#0d2a0d;border:1px solid #166534;border-radius:10px;padding:12px 16px;margin-top:10px;font-size:0.83rem;color:#4ade80;">
-        💡 If Mac says "can't be opened", right-click the file → <strong>Open</strong> → <strong>Open</strong> again.
+  <button class="dl-btn" onclick="startDownload('mac')">
+    ⬇ &nbsp;Download Installer for Mac
+  </button>
+
+  <div class="after-steps" id="mac-after" style="display:none">
+    <p class="section-label" style="margin-top:32px">After downloading</p>
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <h3>Find the downloaded file</h3>
+        <p>Look in your <strong>Downloads</strong> folder for <strong>install_chatbot.command</strong>.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <h3>Double-click it</h3>
+        <p>A Terminal window opens and handles everything automatically. The chatbot app window will appear when it's done.</p>
+        <div class="tip">💡 If Mac says "can't be opened" → right-click the file → <strong>Open</strong> → <strong>Open</strong> again.</div>
       </div>
     </div>
   </div>
 
-  <div class="done-box">
-    <h2>You're all set!</h2>
-    <p>The chatbot app window opens automatically after setup.<br>To open it again later, just double-click <strong>install_mac.command</strong> again.</p>
-  </div>
-
 </div>
 
-<!-- WINDOWS -->
+<!-- ══ WINDOWS ══ -->
 <div id="os-win" class="os-section">
 
-  <div class="step">
-    <div class="step-left"><div class="step-num">1</div><div class="step-line"></div></div>
-    <div class="step-body">
-      <h3>Download the files</h3>
-      <p>Click below to download. Then find <strong>ai-agent-main.zip</strong> in Downloads, right-click → <strong>Extract All</strong>.</p>
-      <a class="big-download" href="https://github.com/veldan123/ai-agent/archive/refs/heads/main.zip">
-        <div class="dl-icon">⬇</div>
-        <div>
-          <div>Download for Windows</div>
-          <div class="dl-sub">ai-agent-main.zip</div>
-        </div>
-      </a>
+  <p class="section-label">Choose what to install</p>
+  <div class="components">
+
+    <div class="comp-row checked" id="win-python" onclick="toggle(this)">
+      <div class="comp-check">
+        <svg width="13" height="13" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="comp-info">
+        <div class="comp-name">Python 3 <span class="tag tag-req">Required</span></div>
+        <div class="comp-desc">Needed to run the chatbot. Uncheck if Python 3 is already installed. Make sure "Add Python to PATH" was checked during install.</div>
+      </div>
     </div>
+
+    <div class="comp-row checked" id="win-ollama" onclick="toggle(this)">
+      <div class="comp-check">
+        <svg width="13" height="13" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="comp-info">
+        <div class="comp-name">Ollama <span class="tag tag-req">Required</span></div>
+        <div class="comp-desc">Runs the AI locally. Uncheck if Ollama is already installed on your PC.</div>
+      </div>
+    </div>
+
+    <div class="comp-row checked" id="win-model" onclick="toggle(this)">
+      <div class="comp-check">
+        <svg width="13" height="13" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="comp-info">
+        <div class="comp-name">AI Model — qwen2.5:7b <span class="tag tag-size">~4 GB</span> <span class="tag tag-req">Required</span></div>
+        <div class="comp-desc">The AI brain. Only downloaded once. Uncheck if you've already pulled qwen2.5:7b in Ollama.</div>
+      </div>
+    </div>
+
+    <div class="comp-row checked disabled">
+      <div class="comp-check">
+        <svg width="13" height="13" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="comp-info">
+        <div class="comp-name">Chatbot App <span class="tag tag-always">Always included</span></div>
+        <div class="comp-desc">The chatbot window itself — always downloaded and launched.</div>
+      </div>
+    </div>
+
   </div>
 
-  <div class="step">
-    <div class="step-left"><div class="step-num">2</div><div class="step-line"></div></div>
-    <div class="step-body">
-      <h3>Install Python <span class="tag tag-once">One-time</span></h3>
-      <p>Download from <strong>python.org/downloads</strong>. During install, tick <strong>"Add Python to PATH"</strong> — this is important!</p>
-    </div>
-  </div>
+  <button class="dl-btn" onclick="startDownload('win')">
+    ⬇ &nbsp;Download Installer for Windows
+  </button>
 
-  <div class="step">
-    <div class="step-left"><div class="step-num">3</div><div class="step-line"></div></div>
-    <div class="step-body">
-      <h3>Install Ollama <span class="tag tag-once">One-time</span></h3>
-      <p>Download and install from <strong>ollama.com/download</strong>.</p>
+  <div class="after-steps" id="win-after" style="display:none">
+    <p class="section-label" style="margin-top:32px">After downloading</p>
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <h3>Find the downloaded file</h3>
+        <p>Look in your <strong>Downloads</strong> folder for <strong>install_chatbot.bat</strong>.</p>
+      </div>
     </div>
-  </div>
-
-  <div class="step">
-    <div class="step-left"><div class="step-num">4</div></div>
-    <div class="step-body">
-      <h3>Run the installer <span class="tag tag-auto">Sets up everything</span></h3>
-      <p>Open the unzipped folder → go into <strong>chatbot_app</strong> → double-click <strong>install_windows.bat</strong>.</p>
-      <p>It downloads the AI model (~4GB, one-time) and launches the app automatically. First run takes ~5–10 minutes.</p>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <h3>Double-click it</h3>
+        <p>A window opens and handles everything automatically. The chatbot app will appear when it's done.</p>
+        <div class="tip">💡 If Windows shows a blue warning screen → click <strong>More info</strong> → <strong>Run anyway</strong>.</div>
+      </div>
     </div>
-  </div>
-
-  <div class="done-box">
-    <h2>You're all set!</h2>
-    <p>The chatbot app window will open automatically after setup.<br>To open it again later, double-click <strong>install_windows.bat</strong> or run:</p>
-    <p class="reopen-note"><code>python chatbot_app.py</code></p>
   </div>
 
 </div>
@@ -218,16 +308,126 @@
 </footer>
 
 <script>
+  let pendingOS = null;
+
+  // ── OS toggle ──
   function showOS(os) {
     document.getElementById("os-mac").classList.toggle("visible", os === "mac");
     document.getElementById("os-win").classList.toggle("visible", os === "win");
     document.getElementById("btn-mac").classList.toggle("active", os === "mac");
     document.getElementById("btn-win").classList.toggle("active", os === "win");
   }
+  window.addEventListener("load", () => showOS(navigator.userAgent.includes("Win") ? "win" : "mac"));
 
-  window.addEventListener("load", () => {
-    showOS(navigator.userAgent.includes("Win") ? "win" : "mac");
-  });
+  // ── Checkbox toggle ──
+  function toggle(row) {
+    if (row.classList.contains("disabled")) return;
+    row.classList.toggle("checked");
+  }
+
+  // ── Download flow ──
+  function startDownload(os) {
+    pendingOS = os;
+    const prefix = os === "mac" ? "mac" : "win";
+
+    const installPython = document.getElementById(prefix + "-python").classList.contains("checked");
+    const installOllama = document.getElementById(prefix + "-ollama").classList.contains("checked");
+    const installModel  = document.getElementById(prefix + "-model").classList.contains("checked");
+
+    const missing = [];
+    if (!installPython) missing.push("Python 3");
+    if (!installOllama) missing.push("Ollama");
+    if (!installModel)  missing.push("AI Model (qwen2.5:7b)");
+
+    if (missing.length > 0) {
+      const list = document.getElementById("missingList");
+      list.innerHTML = missing.map(m => `<span class="modal-pill">${m}</span>`).join("");
+      document.getElementById("warningModal").classList.add("open");
+    } else {
+      doDownload(os, installPython, installOllama, installModel);
+    }
+  }
+
+  function closeWarning() {
+    document.getElementById("warningModal").classList.remove("open");
+    pendingOS = null;
+  }
+
+  function confirmDownload() {
+    document.getElementById("warningModal").classList.remove("open");
+    const os = pendingOS;
+    const prefix = os === "mac" ? "mac" : "win";
+    doDownload(
+      os,
+      document.getElementById(prefix + "-python").classList.contains("checked"),
+      document.getElementById(prefix + "-ollama").classList.contains("checked"),
+      document.getElementById(prefix + "-model").classList.contains("checked")
+    );
+  }
+
+  function doDownload(os, python, ollama, model) {
+    const script = os === "mac" ? buildMac(python, ollama, model) : buildWin(python, ollama, model);
+    const filename = os === "mac" ? "install_chatbot.command" : "install_chatbot.bat";
+    const blob = new Blob([script], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    document.getElementById(os + "-after").style.display = "block";
+    document.getElementById(os + "-after").scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  // ── Script builders ──
+  function buildMac(python, ollama, model) {
+    const APP_URL = "https://raw.githubusercontent.com/veldan123/ai-agent/main/chatbot_app/chatbot_app.py";
+    let s = `#!/bin/bash\nclear\necho ""\necho "  ╔══════════════════════════════════╗"\necho "  ║   AI Chatbot — Setup             ║"\necho "  ╚══════════════════════════════════╝"\necho ""\n\n`;
+
+    if (python) {
+      s += `# ── Install Homebrew ──\nif ! command -v brew &>/dev/null; then\n    echo "  Installing Homebrew..."\n    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"\n    [ -f /opt/homebrew/bin/brew ] && eval "$(/opt/homebrew/bin/brew shellenv)"\nfi\n\n# ── Install Python ──\nif ! command -v python3 &>/dev/null; then\n    echo "  Installing Python..."\n    brew install python3\nfi\necho "  ✓ Python ready: $(python3 --version)"\n\n`;
+    }
+
+    if (ollama) {
+      s += `# ── Install Ollama ──\nif ! command -v ollama &>/dev/null; then\n    echo "  Installing Ollama..."\n    brew install ollama\nfi\necho "  ✓ Ollama ready"\n\n`;
+    }
+
+    s += `# ── Start Ollama ──\necho "  Starting Ollama..."\npkill ollama 2>/dev/null; sleep 1\nollama serve &>/dev/null &\nsleep 3\necho "  ✓ Ollama running"\n\n`;
+
+    if (model) {
+      s += `# ── Pull AI model ──\necho "  Downloading AI model (~4GB, one-time)..."\nollama pull qwen2.5:7b\necho "  ✓ Model ready"\n\n`;
+    }
+
+    s += `# ── Install packages ──\necho "  Installing Python packages..."\npython3 -m pip install -q customtkinter ollama\necho "  ✓ Packages installed"\n\n`;
+    s += `# ── Download app ──\necho "  Downloading chatbot app..."\nmkdir -p ~/chatbot_app\ncurl -fsSL "${APP_URL}" -o ~/chatbot_app/chatbot_app.py\necho "  ✓ App ready"\n\n`;
+    s += `echo ""\necho "  ✓ Done! Opening chatbot window..."\necho ""\npython3 ~/chatbot_app/chatbot_app.py\n`;
+    return s;
+  }
+
+  function buildWin(python, ollama, model) {
+    const APP_URL = "https://raw.githubusercontent.com/veldan123/ai-agent/main/chatbot_app/chatbot_app.py";
+    let s = `@echo off\ntitle AI Chatbot Setup\ncls\necho.\necho   =====================================\necho   AI Chatbot Setup\necho   =====================================\necho.\n\n`;
+
+    if (python) {
+      s += `:: ── Python check ──\npython --version >nul 2>&1\nif errorlevel 1 (\n    echo   Python not found. Opening download page...\n    start https://www.python.org/downloads/\n    echo   Install Python, check "Add Python to PATH", then re-run this file.\n    pause\n    exit /b 1\n)\necho   ✓ Python found\n\n`;
+    }
+
+    if (ollama) {
+      s += `:: ── Ollama check ──\nollama --version >nul 2>&1\nif errorlevel 1 (\n    echo   Ollama not found. Opening download page...\n    start https://ollama.com/download\n    echo   Install Ollama, then re-run this file.\n    pause\n    exit /b 1\n)\necho   ✓ Ollama found\n\n`;
+    }
+
+    s += `:: ── Start Ollama ──\necho   Starting Ollama...\ntaskkill /f /im "ollama.exe" >nul 2>&1\ntimeout /t 1 /nobreak >nul\nstart /b ollama serve\ntimeout /t 4 /nobreak >nul\necho   ✓ Ollama running\n\n`;
+
+    if (model) {
+      s += `:: ── Pull model ──\necho   Downloading AI model (~4GB, one-time)...\nollama pull qwen2.5:7b\necho   ✓ Model ready\n\n`;
+    }
+
+    s += `:: ── Install packages ──\necho   Installing Python packages...\npython -m pip install -q customtkinter ollama\necho   ✓ Packages installed\n\n`;
+    s += `:: ── Download app ──\necho   Downloading chatbot app...\nif not exist "%USERPROFILE%\\chatbot_app" mkdir "%USERPROFILE%\\chatbot_app"\ncurl -fsSL "${APP_URL}" -o "%USERPROFILE%\\chatbot_app\\chatbot_app.py"\necho   ✓ App ready\n\n`;
+    s += `echo.\necho   ✓ Done! Opening chatbot window...\necho.\npython "%USERPROFILE%\\chatbot_app\\chatbot_app.py"\npause\n`;
+    return s;
+  }
 </script>
 </body>
 </html>
