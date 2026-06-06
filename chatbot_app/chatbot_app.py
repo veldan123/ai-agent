@@ -1,216 +1,197 @@
-import customtkinter as ctk
-import threading
-import ollama
-
-ctk.set_appearance_mode("dark")
+import threading, json, socket, time, sys
+from flask import Flask, request, Response, stream_with_context
+import ollama, webview
 
 MODEL = "qwen2.5:7b"
-PURPLE = "#7c3aed"
-SURFACE = "#0d1117"
-DARK = "#08090f"
-BORDER = "#1e2a3a"
-TEXT = "#e2e8f0"
-MUTED = "#94a3b8"
-ACCENT = "#a78bfa"
-PINK = "#f472b6"
+server = Flask(__name__)
+
+HTML = """<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>AI Chatbot</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#0a0a0f;color:#e2e8f0;height:100vh;display:flex;overflow:hidden}
+.sidebar{width:220px;background:#08090f;border-right:1px solid #1e2a3a;display:flex;flex-direction:column;flex-shrink:0}
+.sidebar-top{padding:14px}
+.new-btn{width:100%;background:linear-gradient(135deg,#6d28d9,#7c3aed);color:#fff;border:none;border-radius:10px;padding:11px;font-size:13px;font-weight:700;cursor:pointer;transition:opacity .15s}
+.new-btn:hover{opacity:.85}
+.sidebar-foot{padding:12px 16px;font-size:11px;color:#334155;border-top:1px solid #1e2a3a;margin-top:auto}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.messages{flex:1;overflow-y:auto;padding:24px 0}
+.messages::-webkit-scrollbar{width:4px}
+.messages::-webkit-scrollbar-thumb{background:#1e2a3a;border-radius:4px}
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:20px;padding:40px}
+.empty-title{font-size:1.5rem;font-weight:800;color:#f1f5f9}
+.empty-sub{font-size:.9rem;color:#64748b;text-align:center}
+.suggestions{display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:520px;width:100%}
+.sug{background:#0d1117;border:1px solid #1e2a3a;border-radius:12px;padding:13px 15px;font-size:.83rem;color:#94a3b8;cursor:pointer;text-align:left;line-height:1.5;transition:border-color .15s,color .15s}
+.sug:hover{border-color:#7c3aed;color:#e2e8f0}
+.msg-row{display:flex;padding:4px 20px;max-width:820px;margin:0 auto;width:100%}
+.msg-row.user{justify-content:flex-end}
+.bubble{max-width:72%;padding:12px 16px;border-radius:18px;font-size:.92rem;line-height:1.7;white-space:pre-wrap;word-break:break-word}
+.user .bubble{background:linear-gradient(135deg,#6d28d9,#7c3aed);color:#fff;border-bottom-right-radius:4px}
+.assistant .bubble{background:#0d1117;border:1px solid #1e2a3a;color:#e2e8f0;border-bottom-left-radius:4px}
+.cursor{display:inline-block;width:2px;height:1em;background:#a78bfa;border-radius:1px;margin-left:2px;vertical-align:middle;animation:blink .8s step-end infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+.input-area{padding:14px 20px 20px;border-top:1px solid #1e2a3a;background:#0a0a0f}
+.input-wrap{max-width:820px;margin:0 auto;background:#0d1117;border:1px solid #1e2a3a;border-radius:14px;display:flex;align-items:flex-end;gap:10px;padding:10px 12px;transition:border-color .2s}
+.input-wrap:focus-within{border-color:#7c3aed}
+textarea{flex:1;background:none;border:none;outline:none;color:#e2e8f0;font-size:.93rem;line-height:1.6;resize:none;max-height:160px;font-family:inherit;padding:2px 0}
+textarea::placeholder{color:#475569}
+.send{width:36px;height:36px;background:linear-gradient(135deg,#6d28d9,#7c3aed);border:none;border-radius:9px;color:#fff;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:opacity .15s}
+.send:hover{opacity:.85}
+.send:disabled{opacity:.35;cursor:not-allowed}
+.hint{max-width:820px;margin:6px auto 0;font-size:11px;color:#334155;text-align:center}
+</style>
+</head>
+<body>
+<div class="sidebar">
+  <div class="sidebar-top">
+    <button class="new-btn" onclick="newChat()">+ New Chat</button>
+  </div>
+  <div class="sidebar-foot">AI Chatbot &mdash; Local</div>
+</div>
+<div class="main">
+  <div class="messages" id="msgs"></div>
+  <div class="input-area">
+    <div class="input-wrap">
+      <textarea id="inp" rows="1" placeholder="Message AI..." onkeydown="handleKey(event)" oninput="resize(this)"></textarea>
+      <button class="send" id="sendBtn" onclick="send()">&#10148;</button>
+    </div>
+    <div class="hint">Enter to send &nbsp;&middot;&nbsp; Shift+Enter for new line</div>
+  </div>
+</div>
+<script>
+let msgs = [], streaming = false;
+
+function welcome() {
+  document.getElementById('msgs').innerHTML = `
+    <div class="empty">
+      <div class="empty-title">What can I help with?</div>
+      <div class="empty-sub">Running privately on your computer &mdash; no internet needed.</div>
+      <div class="suggestions">
+        <button class="sug" onclick="useSug(this)">Write a professional follow-up email</button>
+        <button class="sug" onclick="useSug(this)">Explain machine learning simply</button>
+        <button class="sug" onclick="useSug(this)">Give me 5 business name ideas</button>
+        <button class="sug" onclick="useSug(this)">Write a Python script to rename files</button>
+      </div>
+    </div>`;
+}
+
+function newChat() { msgs = []; welcome(); document.getElementById('inp').focus(); }
+welcome();
+
+function addBubble(role, text) {
+  const e = document.getElementById('msgs');
+  const empty = e.querySelector('.empty');
+  if (empty) empty.remove();
+  const row = document.createElement('div');
+  row.className = `msg-row ${role}`;
+  const b = document.createElement('div');
+  b.className = 'bubble';
+  b.textContent = text;
+  row.appendChild(b);
+  e.appendChild(row);
+  e.scrollTop = e.scrollHeight;
+  return b;
+}
+
+async function send(text) {
+  const inp = document.getElementById('inp');
+  const userText = text || inp.value.trim();
+  if (!userText || streaming) return;
+  inp.value = ''; inp.style.height = 'auto';
+  msgs.push({role:'user', content:userText});
+  addBubble('user', userText);
+  const aiBubble = addBubble('assistant', '');
+  const cursor = document.createElement('span');
+  cursor.className = 'cursor';
+  aiBubble.appendChild(cursor);
+  streaming = true;
+  document.getElementById('sendBtn').disabled = true;
+  let full = '';
+  try {
+    const res = await fetch('/chat', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({messages: msgs})
+    });
+    const reader = res.body.getReader();
+    const dec = new TextDecoder();
+    while(true) {
+      const {done, value} = await reader.read();
+      if(done) break;
+      const lines = dec.decode(value).split('\\n').filter(l=>l.startsWith('data:'));
+      for(const line of lines) {
+        const d = line.slice(5).trim();
+        if(d==='[DONE]') break;
+        try {
+          const obj = JSON.parse(d);
+          if(obj.content) { full+=obj.content; cursor.remove(); aiBubble.textContent=full; aiBubble.appendChild(cursor); document.getElementById('msgs').scrollTop=1e9; }
+          if(obj.error) { cursor.remove(); aiBubble.textContent='Error: '+obj.error; }
+        } catch{}
+      }
+    }
+  } catch(e) {
+    cursor.remove();
+    aiBubble.textContent = 'Could not reach Ollama. Make sure it is running.';
+  }
+  cursor.remove();
+  if(full) msgs.push({role:'assistant', content:full});
+  streaming = false;
+  document.getElementById('sendBtn').disabled = false;
+  document.getElementById('inp').focus();
+}
+
+function useSug(btn) { send(btn.textContent); }
+function handleKey(e) { if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();} }
+function resize(el) { el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,160)+'px'; }
+</script>
+</body>
+</html>"""
 
 
-class ChatApp(ctk.CTk):
-    def __init__(self):
-        super().__init__()
-        self.title("AI Chatbot")
-        self.geometry("980x700")
-        self.minsize(640, 460)
-        self.configure(fg_color="#0a0a0f")
+@server.route("/")
+def index():
+    return HTML
 
-        self.messages = []
-        self.is_streaming = False
 
-        self._build()
-        self.after(3000, self._check_ollama)
+@server.route("/chat", methods=["POST"])
+def chat():
+    messages = request.json.get("messages", [])
 
-    def _build(self):
-        self.grid_columnconfigure(1, weight=1)
-        self.grid_rowconfigure(0, weight=1)
-
-        # ── Sidebar ──
-        sb = ctk.CTkFrame(self, width=220, fg_color=DARK, corner_radius=0)
-        sb.grid(row=0, column=0, sticky="nsew")
-        sb.grid_propagate(False)
-        sb.grid_rowconfigure(1, weight=1)
-        sb.grid_columnconfigure(0, weight=1)
-
-        ctk.CTkButton(
-            sb, text="+ New Chat", height=42,
-            fg_color=PURPLE, hover_color="#5b21b6",
-            font=ctk.CTkFont(size=13, weight="bold"),
-            corner_radius=10, command=self._new_chat
-        ).grid(row=0, column=0, padx=14, pady=(18, 10), sticky="ew")
-
-        ctk.CTkLabel(
-            sb, text="Model", text_color="#475569",
-            font=ctk.CTkFont(size=10, weight="bold")
-        ).grid(row=2, column=0, sticky="w", padx=16, pady=(0, 2))
-
-        ctk.CTkLabel(
-            sb, text="qwen2.5:7b",
-            text_color=MUTED, font=ctk.CTkFont(size=11)
-        ).grid(row=3, column=0, sticky="w", padx=16, pady=(0, 12))
-
-        self.status_label = ctk.CTkLabel(
-            sb, text="● Connecting...",
-            text_color=MUTED, font=ctk.CTkFont(size=11)
-        )
-        self.status_label.grid(row=4, column=0, sticky="w", padx=16, pady=(0, 16))
-
-        # ── Main ──
-        main = ctk.CTkFrame(self, fg_color="#0a0a0f", corner_radius=0)
-        main.grid(row=0, column=1, sticky="nsew")
-        main.grid_rowconfigure(0, weight=1)
-        main.grid_columnconfigure(0, weight=1)
-
-        # Chat area
-        self.chat = ctk.CTkTextbox(
-            main, state="disabled", wrap="word",
-            fg_color=SURFACE, text_color=TEXT,
-            font=ctk.CTkFont(size=14),
-            corner_radius=0, border_width=0,
-            scrollbar_button_color=BORDER,
-            scrollbar_button_hover_color="#2d3748"
-        )
-        self.chat.grid(row=0, column=0, sticky="nsew")
-
-        # Text tags via internal textbox
-        t = self.chat._textbox
-        t.tag_configure("you",  foreground=ACCENT,     font=(None, 12, "bold"))
-        t.tag_configure("ai",   foreground=PINK,        font=(None, 12, "bold"))
-        t.tag_configure("msg",  foreground=TEXT,        font=(None, 14))
-        t.tag_configure("dim",  foreground=MUTED,       font=(None, 13))
-        t.tag_configure("err",  foreground="#ef4444",   font=(None, 13))
-
-        # Input bar
-        bar = ctk.CTkFrame(main, fg_color=SURFACE, corner_radius=0)
-        bar.grid(row=1, column=0, sticky="ew")
-        bar.grid_columnconfigure(0, weight=1)
-
-        self.input_box = ctk.CTkTextbox(
-            bar, height=72, fg_color="#161b22",
-            border_color=BORDER, border_width=1,
-            text_color=TEXT, font=ctk.CTkFont(size=14),
-            corner_radius=12, wrap="word"
-        )
-        self.input_box.grid(row=0, column=0, padx=(16, 8), pady=14, sticky="ew")
-        self.input_box.bind("<Return>", self._on_enter)
-
-        self.send_btn = ctk.CTkButton(
-            bar, text="Send", width=90, height=46,
-            fg_color=PURPLE, hover_color="#5b21b6",
-            font=ctk.CTkFont(size=13, weight="bold"),
-            corner_radius=10, command=self._send
-        )
-        self.send_btn.grid(row=0, column=1, padx=(0, 16), pady=14)
-
-        ctk.CTkLabel(
-            bar, text="Enter to send  |  Shift+Enter for new line",
-            text_color="#475569", font=ctk.CTkFont(size=10)
-        ).grid(row=1, column=0, columnspan=2, pady=(0, 8))
-
-        self._show_welcome()
-
-    def _show_welcome(self):
-        self.chat.configure(state="normal")
-        self.chat.delete("1.0", "end")
-        self.chat.insert("end", "\n\n\n")
-        self.chat.insert("end", "  AI Chatbot\n\n", "you")
-        self.chat.insert("end", "  Ask me anything. I am running privately on your computer.\n\n", "msg")
-        self.chat.insert("end", "  Try asking:\n", "dim")
-        self.chat.insert("end", "  - Write me a business email\n", "dim")
-        self.chat.insert("end", "  - Explain machine learning simply\n", "dim")
-        self.chat.insert("end", "  - Give me 5 business name ideas\n\n", "dim")
-        self.chat.configure(state="disabled")
-
-    def _new_chat(self):
-        self.messages = []
-        self.is_streaming = False
-        self.send_btn.configure(state="normal", text="Send")
-        self._show_welcome()
-        self.input_box.focus()
-
-    def _write(self, text, tag="msg"):
-        self.chat.configure(state="normal")
-        self.chat.insert("end", text, tag)
-        self.chat.configure(state="disabled")
-        self.chat.see("end")
-
-    def _on_enter(self, event):
-        if not (event.state & 0x1):
-            self._send()
-            return "break"
-
-    def _send(self):
-        if self.is_streaming:
-            return
-        text = self.input_box.get("1.0", "end").strip()
-        if not text:
-            return
-
-        self.input_box.delete("1.0", "end")
-        self.messages.append({"role": "user", "content": text})
-
-        content = self.chat.get("1.0", "end")
-        if "Ask me anything" in content:
-            self.chat.configure(state="normal")
-            self.chat.delete("1.0", "end")
-            self.chat.configure(state="disabled")
-
-        self._write("\n  You\n", "you")
-        self._write(f"  {text}\n\n", "msg")
-        self._write("  AI\n", "ai")
-
-        self.is_streaming = True
-        self.send_btn.configure(state="disabled", text="...")
-
-        threading.Thread(target=self._stream, daemon=True).start()
-
-    def _stream(self):
-        full = ""
+    def generate():
         try:
-            stream = ollama.chat(model=MODEL, messages=self.messages, stream=True)
+            stream = ollama.chat(model=MODEL, messages=messages, stream=True)
             for chunk in stream:
-                piece = chunk.message.content or ""
-                full += piece
-                self.after(0, lambda p=piece: self._write(p, "msg"))
-        except Exception:
-            self.after(0, lambda: self._write(
-                "\n  Could not reach Ollama. Open a terminal and run: ollama serve\n\n", "err"
-            ))
-            self.after(0, self._done)
-            return
+                content = chunk.message.content or ""
+                if content:
+                    yield f"data: {json.dumps({'content': content})}\n\n"
+        except Exception as e:
+            yield f"data: {json.dumps({'error': str(e)})}\n\n"
+        yield "data: [DONE]\n\n"
 
-        self.messages.append({"role": "assistant", "content": full})
-        self.after(0, lambda: self._write("\n\n", "msg"))
-        self.after(0, self._done)
+    return Response(stream_with_context(generate()), mimetype="text/event-stream")
 
-    def _done(self):
-        self.is_streaming = False
-        self.send_btn.configure(state="normal", text="Send")
 
-    def _check_ollama(self):
-        try:
-            ollama.list()
-            self.status_label.configure(text="● Online", text_color="#22c55e")
-        except Exception:
-            self.status_label.configure(text="● Offline", text_color="#ef4444")
-            self.chat.configure(state="normal")
-            self.chat.delete("1.0", "end")
-            self.chat.insert("end", "\n\n\n")
-            self.chat.insert("end", "  Ollama is not running\n\n", "err")
-            self.chat.insert("end", "  Open a terminal and type:\n\n", "dim")
-            self.chat.insert("end", "       ollama serve\n\n", "you")
-            self.chat.insert("end", "  Then restart this app.\n\n", "dim")
-            self.chat.configure(state="disabled")
+def free_port():
+    with socket.socket() as s:
+        s.bind(("", 0))
+        return s.getsockname()[1]
 
 
 if __name__ == "__main__":
-    app = ChatApp()
-    app.mainloop()
+    port = free_port()
+
+    def run():
+        server.run(port=port, debug=False, use_reloader=False, threaded=True)
+
+    threading.Thread(target=run, daemon=True).start()
+    time.sleep(1)
+
+    webview.create_window("AI Chatbot", f"http://127.0.0.1:{port}",
+                          width=1020, height=720, resizable=True, min_size=(600, 420))
+    webview.start()

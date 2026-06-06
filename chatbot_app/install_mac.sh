@@ -24,12 +24,7 @@ if ! command -v python3 &>/dev/null; then
 fi
 echo "  ✓ Python ready: $(python3 --version)"
 
-# ── Step 3: Python Tk (required for the app window) ──
-echo "  Installing Python Tk..."
-brew install python-tk 2>/dev/null || true
-echo "  ✓ Tk ready"
-
-# ── Step 4: Ollama ──
+# ── Step 3: Ollama ──
 if ! command -v ollama &>/dev/null; then
     echo "  Installing Ollama..."
     brew install ollama
@@ -53,7 +48,7 @@ echo "  ✓ AI model ready"
 
 # ── Step 6: Python packages ──
 echo "  Installing Python packages..."
-python3 -m pip install -q customtkinter ollama
+python3 -m pip install -q flask pywebview ollama
 echo "  ✓ Packages installed"
 
 # ── Step 7: Download app ──
