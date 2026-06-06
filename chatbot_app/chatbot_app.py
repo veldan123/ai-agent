@@ -1,6 +1,11 @@
-import threading, json, socket, time, os, sqlite3, hashlib, uuid
+import threading, json, socket, time, os, sqlite3, hashlib, uuid, urllib.request
 from flask import Flask, request, Response, session, jsonify, stream_with_context
 import ollama, webview
+
+VERSION     = "1.2.0"
+VERSION_URL = "https://raw.githubusercontent.com/veldan123/ai-agent/main/chatbot_app/version.txt"
+APP_URL     = "https://raw.githubusercontent.com/veldan123/ai-agent/main/chatbot_app/chatbot_app.py"
+APP_PATH    = os.path.expanduser("~/chatbot_app/chatbot_app.py")
 
 MODEL    = "qwen2.5:7b"
 DB_PATH  = os.path.expanduser("~/chatbot_app/chats.db")
@@ -537,7 +542,20 @@ def free_port():
         return s.getsockname()[1]
 
 
+def check_update():
+    try:
+        with urllib.request.urlopen(VERSION_URL, timeout=5) as r:
+            remote = r.read().decode().strip()
+        if remote != VERSION:
+            print(f"  Updating {VERSION} → {remote}…")
+            urllib.request.urlretrieve(APP_URL, APP_PATH)
+            os.execv(sys.executable, [sys.executable, APP_PATH])
+    except Exception:
+        pass  # No internet or GitHub down — just continue
+
+
 if __name__ == "__main__":
+    check_update()
     init_db()
     port = free_port()
 
