@@ -235,8 +235,8 @@
         <svg width="13" height="13" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </div>
       <div class="comp-info">
-        <div class="comp-name">AI Model — mistral:7b <span class="tag tag-size">~4 GB</span> <span class="tag tag-req">Required</span></div>
-        <div class="comp-desc">The AI brain. Only downloaded once. Uncheck if you've already pulled mistral:7b in Ollama.</div>
+        <div class="comp-name">AI Model — gemma3:4b <span class="tag tag-size">~4 GB</span> <span class="tag tag-req">Required</span></div>
+        <div class="comp-desc">The AI brain. Only downloaded once. Uncheck if you've already pulled gemma3:4b in Ollama.</div>
       </div>
     </div>
 
@@ -321,7 +321,7 @@
     const missing = [];
     if (!installPython) missing.push("Python 3");
     if (!installOllama) missing.push("Ollama");
-    if (!installModel)  missing.push("AI Model (mistral:7b)");
+    if (!installModel)  missing.push("AI Model (gemma3:4b)");
     if (missing.length > 0) {
       document.getElementById("missingList").innerHTML = missing.map(m => `<span class="modal-pill">${m}</span>`).join("");
       document.getElementById("warningModal").classList.add("open");
@@ -378,7 +378,7 @@
     s += `# ── Start Ollama ──\necho "  Starting Ollama..."\npkill ollama 2>/dev/null; sleep 1\nollama serve &>/dev/null &\nsleep 3\necho "  ✓ Ollama running"\n\n`;
 
     if (model) {
-      s += `# ── Pull AI model ──\necho "  Downloading AI model (~4GB, one-time)..."\nollama pull mistral:7b\necho "  ✓ Model ready"\n\n`;
+      s += `# ── Pull AI model ──\necho "  Downloading AI model (~4GB, one-time)..."\nollama pull gemma3:4b\necho "  ✓ Model ready"\n\n`;
     }
 
     s += `# ── Install packages ──\necho "  Installing Python packages..."\npython3 -m pip install -q flask pywebview ollama duckduckgo-search --break-system-packages\necho "  ✓ Packages installed"\n\n`;
@@ -402,7 +402,7 @@
     s += `:: ── Start Ollama ──\necho   Starting Ollama...\ntaskkill /f /im "ollama.exe" >nul 2>&1\ntimeout /t 1 /nobreak >nul\nstart /b ollama serve\ntimeout /t 4 /nobreak >nul\necho   ✓ Ollama running\n\n`;
 
     if (model) {
-      s += `:: ── Pull model ──\necho   Downloading AI model (~4GB, one-time)...\nollama pull mistral:7b\necho   ✓ Model ready\n\n`;
+      s += `:: ── Pull model ──\necho   Downloading AI model (~4GB, one-time)...\nollama pull gemma3:4b\necho   ✓ Model ready\n\n`;
     }
 
     s += `:: ── Install packages ──\necho   Installing Python packages...\npython -m pip install -q flask pywebview ollama duckduckgo-search\necho   ✓ Packages installed\n\n`;

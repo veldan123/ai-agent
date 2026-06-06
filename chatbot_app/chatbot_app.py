@@ -8,12 +8,12 @@ try:
 except ImportError:
     HAS_DDG = False
 
-VERSION     = "1.5.5"
+VERSION     = "1.5.6"
 VERSION_URL = "https://raw.githubusercontent.com/veldan123/ai-agent/main/chatbot_app/version.txt"
 APP_URL     = "https://raw.githubusercontent.com/veldan123/ai-agent/main/chatbot_app/chatbot_app.py"
 APP_PATH    = os.path.expanduser("~/chatbot_app/chatbot_app.py")
 
-MODEL    = "mistral:7b"
+MODEL    = "gemma3:4b"
 DB_PATH  = os.path.expanduser("~/chatbot_app/chats.db")
 KEY_FILE = os.path.expanduser("~/chatbot_app/.secret")
 
