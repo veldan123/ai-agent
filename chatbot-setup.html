@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Setup — AI Chatbot</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #0a0a0f; color: #e2e8f0; min-height: 100vh; }
+
+    nav { display: flex; align-items: center; justify-content: space-between; padding: 18px 40px; border-bottom: 1px solid #1e2a3a; }
+    .nav-logo { font-weight: 800; font-size: 1rem; color: #a78bfa; text-decoration: none; }
+    .nav-link  { font-size: 0.85rem; color: #64748b; text-decoration: none; }
+    .nav-link:hover { color: #a78bfa; }
+
+    .hero {
+      text-align: center;
+      padding: 60px 24px 40px;
+      background: radial-gradient(ellipse 70% 50% at 50% 0%, #1a0a3a 0%, #0a0a0f 70%);
+      border-bottom: 1px solid #1e2a3a;
+    }
+    .download-badge { display: inline-flex; align-items: center; gap: 8px; background: #0d2a0d; border: 1px solid #166534; color: #4ade80; font-size: 13px; font-weight: 600; padding: 8px 18px; border-radius: 99px; margin-bottom: 28px; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{box-shadow:0 0 0 0 rgba(74,222,128,0.2)} 50%{box-shadow:0 0 0 8px rgba(74,222,128,0)} }
+
+    h1 { font-size: clamp(1.8rem, 5vw, 2.8rem); font-weight: 800; letter-spacing: -0.5px; margin-bottom: 14px; color: #f1f5f9; }
+    h1 span { background: linear-gradient(135deg, #a78bfa, #f472b6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .subtitle { color: #64748b; font-size: 1rem; max-width: 480px; margin: 0 auto 24px; line-height: 1.6; }
+
+    .os-btns { display: flex; gap: 10px; justify-content: center; margin-top: 8px; }
+    .os-btn { background: #0d1117; border: 1px solid #1e2a3a; color: #64748b; font-size: 0.9rem; font-weight: 600; padding: 10px 22px; border-radius: 99px; cursor: pointer; transition: all 0.15s; }
+    .os-btn.active { background: #6d28d9; border-color: #6d28d9; color: #fff; }
+
+    .content { max-width: 700px; margin: 0 auto; padding: 60px 24px 80px; }
+    .os-section { display: none; }
+    .os-section.visible { display: block; }
+
+    .step { display: flex; gap: 20px; margin-bottom: 20px; }
+    .step-left { display: flex; flex-direction: column; align-items: center; }
+    .step-num { min-width: 40px; height: 40px; background: linear-gradient(135deg, #6d28d9, #7c3aed); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 15px; color: #fff; flex-shrink: 0; }
+    .step-line { width: 2px; flex: 1; background: #1e2a3a; margin: 6px 0; min-height: 20px; }
+    .step-body { background: #0d1117; border: 1px solid #1e2a3a; border-radius: 14px; padding: 22px 26px; flex: 1; }
+    .step-body h3 { font-size: 1rem; font-weight: 700; color: #f1f5f9; margin-bottom: 8px; }
+    .step-body p { font-size: 0.88rem; color: #64748b; line-height: 1.7; margin-bottom: 10px; }
+    .step-body p:last-child { margin-bottom: 0; }
+
+    .code-block { background: #161b22; border: 1px solid #21262d; border-radius: 10px; padding: 14px 18px; margin: 10px 0; position: relative; }
+    .code-block code { font-family: "SF Mono", "Fira Code", monospace; font-size: 13px; color: #56d4dd; display: block; line-height: 1.8; }
+    .copy-btn { position: absolute; top: 10px; right: 10px; background: #21262d; border: 1px solid #30363d; color: #8b949e; font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 6px; cursor: pointer; transition: all 0.15s; }
+    .copy-btn:hover { background: #6d28d9; color: #fff; border-color: #6d28d9; }
+    .copy-btn.copied { background: #166534; color: #4ade80; border-color: #166534; }
+
+    .tag { display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 5px; margin-left: 6px; }
+    .tag-once { background: #1e2a3a; color: #60a5fa; }
+    .tag-free { background: #0d2a0d; color: #4ade80; }
+
+    .ollama-link { display: inline-flex; align-items: center; gap: 6px; background: linear-gradient(135deg, #6d28d9, #7c3aed); color: #fff; font-size: 0.88rem; font-weight: 700; padding: 10px 20px; border-radius: 8px; text-decoration: none; margin-top: 10px; transition: opacity 0.15s; }
+    .ollama-link:hover { opacity: 0.85; }
+
+    .done-box { background: linear-gradient(135deg, #0d2a0d, #1a0a3a); border: 1px solid #166534; border-radius: 14px; padding: 28px 30px; text-align: center; margin-top: 40px; }
+    .done-box h2 { font-size: 1.3rem; font-weight: 800; color: #4ade80; margin-bottom: 8px; }
+    .done-box p { color: #64748b; font-size: 0.9rem; margin-bottom: 18px; }
+    .run-command { display: inline-block; background: #161b22; border: 1px solid #21262d; border-radius: 10px; padding: 14px 28px; font-family: "SF Mono", monospace; font-size: 0.95rem; color: #56d4dd; font-weight: 700; }
+    .then-open { margin-top: 14px; font-size: 0.88rem; color: #64748b; }
+    .then-open a { color: #a78bfa; font-weight: 700; text-decoration: none; }
+
+    footer { text-align: center; padding: 24px; font-size: 12px; color: #334155; border-top: 1px solid #1e2a3a; }
+    footer a { color: #a78bfa; text-decoration: none; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="index.html">← AI Tools</a>
+  <a class="nav-link" href="https://github.com/veldan123/ai-agent" target="_blank">GitHub</a>
+</nav>
+
+<div class="hero">
+  <div class="download-badge">✓ Download started</div>
+  <h1>Set up your <span>AI Chatbot</span></h1>
+  <p class="subtitle">Follow these steps and you'll have your own ChatGPT running locally in minutes.</p>
+  <div class="os-btns">
+    <button onclick="showOS('mac')" id="btn-mac" class="os-btn active">🍎 Mac</button>
+    <button onclick="showOS('win')" id="btn-win" class="os-btn">🪟 Windows</button>
+  </div>
+</div>
+
+<div class="content">
+
+<!-- MAC -->
+<div id="os-mac" class="os-section visible">
+
+  <div class="step">
+    <div class="step-left"><div class="step-num">1</div><div class="step-line"></div></div>
+    <div class="step-body">
+      <h3>Unzip the downloaded file</h3>
+      <p>Find <strong>ai-agent-main.zip</strong> in your Downloads folder. Double-click to unzip. Open the folder called <strong>ai-agent-main</strong> and go into the <strong>chatbot</strong> subfolder.</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-left"><div class="step-num">2</div><div class="step-line"></div></div>
+    <div class="step-body">
+      <h3>Install Ollama <span class="tag tag-free">Free</span> <span class="tag tag-once">One-time</span></h3>
+      <p>Download and open Ollama — you'll see a small icon appear in your menu bar.</p>
+      <a class="ollama-link" href="https://ollama.com/download" target="_blank">⬇ Download Ollama</a>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-left"><div class="step-num">3</div><div class="step-line"></div></div>
+    <div class="step-body">
+      <h3>Download the AI model <span class="tag tag-once">One-time · ~4GB</span></h3>
+      <p>Open Terminal (Cmd+Space → type Terminal → Enter) and run:</p>
+      <div class="code-block">
+        <code>ollama pull qwen2.5:7b</code>
+        <button class="copy-btn" onclick="copyCode(this,'ollama pull qwen2.5:7b')">Copy</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-left"><div class="step-num">4</div><div class="step-line"></div></div>
+    <div class="step-body">
+      <h3>Install dependencies <span class="tag tag-once">One-time</span></h3>
+      <div class="code-block">
+        <code>cd ~/Downloads/ai-agent-main/chatbot</code>
+        <button class="copy-btn" onclick="copyCode(this,'cd ~/Downloads/ai-agent-main/chatbot')">Copy</button>
+      </div>
+      <div class="code-block">
+        <code>python3 -m pip install -r requirements.txt</code>
+        <button class="copy-btn" onclick="copyCode(this,'python3 -m pip install -r requirements.txt')">Copy</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-left"><div class="step-num">5</div></div>
+    <div class="step-body">
+      <h3>Run the chatbot</h3>
+      <div class="code-block">
+        <code>python3 app.py</code>
+        <button class="copy-btn" onclick="copyCode(this,'python3 app.py')">Copy</button>
+      </div>
+      <p>Then open your browser and go to <strong>http://localhost:8080</strong></p>
+    </div>
+  </div>
+
+  <div class="done-box">
+    <h2>You're all set!</h2>
+    <p>Every time you want to chat, open Terminal and run:</p>
+    <div class="run-command">python3 ~/Downloads/ai-agent-main/chatbot/app.py</div>
+    <p class="then-open">Then open <a href="http://localhost:8080" target="_blank">http://localhost:8080</a> in your browser.</p>
+  </div>
+
+</div>
+
+<!-- WINDOWS -->
+<div id="os-win" class="os-section">
+
+  <div class="step">
+    <div class="step-left"><div class="step-num">1</div><div class="step-line"></div></div>
+    <div class="step-body">
+      <h3>Unzip the downloaded file</h3>
+      <p>Find <strong>ai-agent-main.zip</strong> in Downloads. Right-click → <strong>Extract All</strong>. Open the <strong>chatbot</strong> subfolder inside.</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-left"><div class="step-num">2</div><div class="step-line"></div></div>
+    <div class="step-body">
+      <h3>Install Python <span class="tag tag-once">One-time</span></h3>
+      <p>Download from <strong>python.org/downloads</strong>. Tick <strong>"Add Python to PATH"</strong> during install.</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-left"><div class="step-num">3</div><div class="step-line"></div></div>
+    <div class="step-body">
+      <h3>Install Ollama <span class="tag tag-free">Free</span> <span class="tag tag-once">One-time</span></h3>
+      <a class="ollama-link" href="https://ollama.com/download" target="_blank">⬇ Download Ollama</a>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-left"><div class="step-num">4</div><div class="step-line"></div></div>
+    <div class="step-body">
+      <h3>Download the AI model <span class="tag tag-once">One-time · ~4GB</span></h3>
+      <p>Open Command Prompt and run:</p>
+      <div class="code-block">
+        <code>ollama pull qwen2.5:7b</code>
+        <button class="copy-btn" onclick="copyCode(this,'ollama pull qwen2.5:7b')">Copy</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-left"><div class="step-num">5</div><div class="step-line"></div></div>
+    <div class="step-body">
+      <h3>Install dependencies <span class="tag tag-once">One-time</span></h3>
+      <div class="code-block">
+        <code>cd %USERPROFILE%\Downloads\ai-agent-main\chatbot</code>
+        <button class="copy-btn" onclick="copyCode(this,'cd %USERPROFILE%\\Downloads\\ai-agent-main\\chatbot')">Copy</button>
+      </div>
+      <div class="code-block">
+        <code>python -m pip install -r requirements.txt</code>
+        <button class="copy-btn" onclick="copyCode(this,'python -m pip install -r requirements.txt')">Copy</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-left"><div class="step-num">6</div></div>
+    <div class="step-body">
+      <h3>Run the chatbot</h3>
+      <div class="code-block">
+        <code>python app.py</code>
+        <button class="copy-btn" onclick="copyCode(this,'python app.py')">Copy</button>
+      </div>
+      <p>Then open your browser and go to <strong>http://localhost:8080</strong></p>
+    </div>
+  </div>
+
+  <div class="done-box">
+    <h2>You're all set!</h2>
+    <p>Every time you want to chat, open Command Prompt and run:</p>
+    <div class="run-command">python %USERPROFILE%\Downloads\ai-agent-main\chatbot\app.py</div>
+    <p class="then-open">Then open <a href="http://localhost:8080" target="_blank">http://localhost:8080</a> in your browser.</p>
+  </div>
+
+</div>
+</div>
+
+<footer>
+  <a href="index.html">← Back to home</a> &nbsp;·&nbsp;
+  <a href="https://github.com/veldan123/ai-agent" target="_blank">GitHub</a>
+</footer>
+
+<script>
+  function detectOS() { return navigator.userAgent.includes("Win") ? "win" : "mac"; }
+
+  function showOS(os) {
+    document.getElementById("os-mac").classList.toggle("visible", os === "mac");
+    document.getElementById("os-win").classList.toggle("visible", os === "win");
+    document.getElementById("btn-mac").classList.toggle("active", os === "mac");
+    document.getElementById("btn-win").classList.toggle("active", os === "win");
+  }
+
+  window.addEventListener("load", () => {
+    showOS(detectOS());
+    const a = document.createElement("a");
+    a.href = "https://github.com/veldan123/ai-agent/archive/refs/heads/main.zip";
+    a.download = "ai-agent.zip";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  });
+
+  function copyCode(btn, text) {
+    navigator.clipboard.writeText(text).then(() => {
+      btn.textContent = "Copied!";
+      btn.classList.add("copied");
+      setTimeout(() => { btn.textContent = "Copy"; btn.classList.remove("copied"); }, 2000);
+    });
+  }
+</script>
+</body>
+</html>
