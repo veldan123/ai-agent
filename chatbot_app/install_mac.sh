@@ -48,7 +48,7 @@ echo "  ✓ AI model ready"
 
 # ── Step 6: Python packages ──
 echo "  Installing Python packages..."
-python3 -m pip install -q flask pywebview ollama --break-system-packages
+python3 -m pip install -q flask pywebview ollama duckduckgo-search --break-system-packages
 echo "  ✓ Packages installed"
 
 # ── Step 7: Download app ──

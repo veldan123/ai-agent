@@ -1,8 +1,14 @@
-import threading, json, socket, time, os, sqlite3, hashlib, uuid, urllib.request
+import threading, json, socket, time, os, sys, sqlite3, hashlib, uuid, urllib.request
 from flask import Flask, request, Response, session, jsonify, stream_with_context
 import ollama, webview
 
-VERSION     = "1.3.0"
+try:
+    from duckduckgo_search import DDGS
+    HAS_DDG = True
+except ImportError:
+    HAS_DDG = False
+
+VERSION     = "1.4.0"
 VERSION_URL = "https://raw.githubusercontent.com/veldan123/ai-agent/main/chatbot_app/version.txt"
 APP_URL     = "https://raw.githubusercontent.com/veldan123/ai-agent/main/chatbot_app/chatbot_app.py"
 APP_PATH    = os.path.expanduser("~/chatbot_app/chatbot_app.py")
@@ -169,6 +175,26 @@ def get_messages(cid):
     c.close()
     return jsonify([dict(r) for r in rows])
 
+# ── Web search ──
+@server.route("/api/search")
+def web_search():
+    uid = session.get("user_id")
+    if not uid:
+        return jsonify({"error": "Not logged in"}), 401
+    if not HAS_DDG:
+        return jsonify({"error": "duckduckgo-search not installed", "results": []})
+    q = request.args.get("q", "").strip()
+    if not q:
+        return jsonify({"results": []})
+    try:
+        with DDGS() as ddgs:
+            hits = list(ddgs.text(q, max_results=5))
+        results = [{"title": h["title"], "body": h["body"], "url": h["href"]} for h in hits]
+        return jsonify({"results": results})
+    except Exception as e:
+        return jsonify({"error": str(e), "results": []})
+
+
 # ── Streaming chat ──
 @server.route("/api/chat", methods=["POST"])
 def chat():
@@ -288,6 +314,12 @@ textarea::placeholder{color:#475569}
 .send{width:36px;height:36px;background:linear-gradient(135deg,#6d28d9,#7c3aed);border:none;border-radius:9px;color:#fff;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:opacity .15s}
 .send:hover{opacity:.85}
 .send:disabled{opacity:.35;cursor:not-allowed}
+.web-btn{width:36px;height:36px;background:#0d1117;border:1px solid #1e2a3a;border-radius:9px;color:#475569;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
+.web-btn:hover{border-color:#7c3aed;color:#a78bfa}
+.web-btn.active{background:#1a1040;border-color:#7c3aed;color:#a78bfa}
+.search-status{max-width:820px;margin:0 auto 6px;font-size:11px;color:#7c3aed;display:none;align-items:center;gap:6px}
+.search-dot{width:6px;height:6px;background:#7c3aed;border-radius:50%;animation:pulse 1s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 .hint{max-width:820px;margin:6px auto 0;font-size:11px;color:#334155;text-align:center}
 </style>
 </head>
@@ -327,17 +359,19 @@ textarea::placeholder{color:#475569}
   <div class="main">
     <div class="messages" id="msgs"></div>
     <div class="input-area">
+      <div class="search-status" id="searchStatus"><div class="search-dot"></div>Searching the web…</div>
       <div class="input-wrap">
+        <button class="web-btn" id="webBtn" onclick="toggleWeb()" title="Toggle web search">🌐</button>
         <textarea id="inp" rows="1" placeholder="Message AI..." onkeydown="handleKey(event)" oninput="resize(this)"></textarea>
         <button class="send" id="sendBtn" onclick="sendMsg()">&#10148;</button>
       </div>
-      <div class="hint">Enter to send &nbsp;·&nbsp; Shift+Enter for new line</div>
+      <div class="hint">🌐 Web search &nbsp;·&nbsp; Enter to send &nbsp;·&nbsp; Shift+Enter for new line</div>
     </div>
   </div>
 </div>
 
 <script>
-let currentChatId = null, msgs = [], streaming = false, isLogin = true;
+let currentChatId = null, msgs = [], streaming = false, isLogin = true, webOn = false;
 
 // ── Boot ──
 async function boot() {
@@ -477,6 +511,25 @@ async function sendMsg(text) {
   inp.value = ''; inp.style.height = 'auto';
   msgs.push({role:'user', content:userText});
   addBubble('user', userText);
+
+  // Web search: inject results as system context
+  let searchCtx = null;
+  if (webOn) {
+    document.getElementById('searchStatus').style.display = 'flex';
+    document.getElementById('sendBtn').disabled = true;
+    try {
+      const sr = await fetch('/api/search?q=' + encodeURIComponent(userText));
+      const sd = await sr.json();
+      if (sd.results && sd.results.length) {
+        let ctx = `Web search results for "${userText}":\n\n`;
+        sd.results.forEach((r,i) => { ctx += `${i+1}. ${r.title}\n${r.url}\n${r.body}\n\n`; });
+        ctx += 'Use the above results to answer with up-to-date information. Cite sources when helpful.';
+        searchCtx = ctx;
+      }
+    } catch(e) {}
+    document.getElementById('searchStatus').style.display = 'none';
+  }
+
   const aiBubble = addBubble('assistant', '');
   const cursor = document.createElement('span');
   cursor.className = 'cursor';
@@ -484,12 +537,17 @@ async function sendMsg(text) {
   streaming = true;
   document.getElementById('sendBtn').disabled = true;
 
+  // Build messages array — prepend search context as system message if available
+  const payload = searchCtx
+    ? [{role:'system', content: searchCtx}, ...msgs]
+    : msgs;
+
   let full = '';
   try {
     const res = await fetch('/api/chat', {
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({messages: msgs, chat_id: currentChatId})
+      body: JSON.stringify({messages: payload, chat_id: currentChatId})
     });
     const reader = res.body.getReader();
     const dec = new TextDecoder();
@@ -525,6 +583,14 @@ async function sendMsg(text) {
   streaming = false;
   document.getElementById('sendBtn').disabled = false;
   document.getElementById('inp').focus();
+}
+
+// ── Web search toggle ──
+function toggleWeb() {
+  webOn = !webOn;
+  const btn = document.getElementById('webBtn');
+  btn.classList.toggle('active', webOn);
+  btn.title = webOn ? 'Web search ON — click to turn off' : 'Web search OFF — click to turn on';
 }
 
 function useSug(btn) { sendMsg(btn.textContent); }
