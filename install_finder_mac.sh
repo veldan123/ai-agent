@@ -44,7 +44,7 @@ echo "  ✓ Model ready"
 
 # ── Python packages ──
 echo "  Installing packages..."
-python3 -m pip install -q ollama requests beautifulsoup4 rich duckduckgo-search
+python3 -m pip install -q ollama requests beautifulsoup4 rich duckduckgo-search --break-system-packages
 echo "  ✓ Packages installed"
 
 # ── Download agent ──
