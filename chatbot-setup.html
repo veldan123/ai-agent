@@ -142,30 +142,20 @@
   </div>
 
   <div class="step">
-    <div class="step-left"><div class="step-num">2</div><div class="step-line"></div></div>
+    <div class="step-left"><div class="step-num">2</div></div>
     <div class="step-body">
-      <h3>Open Terminal</h3>
-      <p>Press <strong>Cmd + Space</strong>, type <strong>Terminal</strong>, hit Enter.</p>
-    </div>
-  </div>
-
-  <div class="step">
-    <div class="step-left"><div class="step-num">3</div></div>
-    <div class="step-body">
-      <h3>Run the installer <span class="tag tag-auto">Installs everything automatically</span></h3>
-      <p>Paste this into Terminal and press Enter. It installs Python, Ollama, downloads the AI model, and launches the app — all at once.</p>
-      <p>The first run takes ~5–10 minutes (downloading the AI model). After that, the app opens instantly.</p>
-      <div style="background:#161b22;border:1px solid #21262d;border-radius:10px;padding:14px 18px;margin-top:10px;position:relative;">
-        <code id="mac-cmd" style="font-family:'SF Mono','Fira Code',monospace;font-size:12px;color:#56d4dd;display:block;line-height:1.8;word-break:break-all;">bash ~/Downloads/ai-agent-main/chatbot_app/install_mac.sh</code>
-        <button onclick="copyMac()" style="position:absolute;top:10px;right:10px;background:#21262d;border:1px solid #30363d;color:#8b949e;font-size:11px;font-weight:600;padding:4px 10px;border-radius:6px;cursor:pointer;" id="mac-copy-btn">Copy</button>
+      <h3>Double-click the installer <span class="tag tag-auto">Installs everything automatically</span></h3>
+      <p>Open the unzipped folder → go into <strong>chatbot_app</strong> → double-click <strong>install_mac.command</strong>.</p>
+      <p>A Terminal window will open and handle everything — Python, Ollama, AI model download, and launching the app. First run takes ~5–10 minutes.</p>
+      <div style="background:#0d2a0d;border:1px solid #166534;border-radius:10px;padding:12px 16px;margin-top:10px;font-size:0.83rem;color:#4ade80;">
+        💡 If Mac says "can't be opened", right-click the file → <strong>Open</strong> → <strong>Open</strong> again.
       </div>
     </div>
   </div>
 
   <div class="done-box">
     <h2>You're all set!</h2>
-    <p>The chatbot app window will open automatically after setup.<br>Every time you want to chat again, just run:</p>
-    <p class="reopen-note"><code>python3 ~/Downloads/ai-agent-main/chatbot_app/chatbot_app.py</code></p>
+    <p>The chatbot app window opens automatically after setup.<br>To open it again later, just double-click <strong>install_mac.command</strong> again.</p>
   </div>
 
 </div>
@@ -233,17 +223,6 @@
     document.getElementById("os-win").classList.toggle("visible", os === "win");
     document.getElementById("btn-mac").classList.toggle("active", os === "mac");
     document.getElementById("btn-win").classList.toggle("active", os === "win");
-  }
-
-  function copyMac() {
-    const cmd = document.getElementById("mac-cmd").textContent;
-    navigator.clipboard.writeText(cmd).then(() => {
-      const btn = document.getElementById("mac-copy-btn");
-      btn.textContent = "Copied!";
-      btn.style.background = "#166534";
-      btn.style.color = "#4ade80";
-      setTimeout(() => { btn.textContent = "Copy"; btn.style.background = ""; btn.style.color = ""; }, 2000);
-    });
   }
 
   window.addEventListener("load", () => {
