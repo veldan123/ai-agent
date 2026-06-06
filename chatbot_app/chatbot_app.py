@@ -2,12 +2,12 @@ import threading, json, socket, time, os, sqlite3, hashlib, uuid, urllib.request
 from flask import Flask, request, Response, session, jsonify, stream_with_context
 import ollama, webview
 
-VERSION     = "1.2.0"
+VERSION     = "1.3.0"
 VERSION_URL = "https://raw.githubusercontent.com/veldan123/ai-agent/main/chatbot_app/version.txt"
 APP_URL     = "https://raw.githubusercontent.com/veldan123/ai-agent/main/chatbot_app/chatbot_app.py"
 APP_PATH    = os.path.expanduser("~/chatbot_app/chatbot_app.py")
 
-MODEL    = "qwen2.5:7b"
+MODEL    = "mistral:7b"
 DB_PATH  = os.path.expanduser("~/chatbot_app/chats.db")
 KEY_FILE = os.path.expanduser("~/chatbot_app/.secret")
 

@@ -40,9 +40,9 @@ sleep 3
 echo "  ✓ Ollama running"
 
 # ── Step 5: Pull model ──
-if ! ollama list 2>/dev/null | grep -q "qwen2.5:7b"; then
+if ! ollama list 2>/dev/null | grep -q "mistral:7b"; then
     echo "  Downloading AI model (~4GB, one-time)..."
-    ollama pull qwen2.5:7b
+    ollama pull mistral:7b
 fi
 echo "  ✓ AI model ready"
 
