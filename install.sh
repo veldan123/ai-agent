@@ -22,8 +22,8 @@ cd ~/contact_finder
 # Download agent files
 echo ""
 echo "Downloading agent files..."
-curl -fsSL https://raw.githubusercontent.com/GITHUB_USERNAME/REPO_NAME/main/agent.py -o agent.py
-curl -fsSL https://raw.githubusercontent.com/GITHUB_USERNAME/REPO_NAME/main/requirements.txt -o requirements.txt
+curl -fsSL https://raw.githubusercontent.com/veldan123/ai-agent/main/agent.py -o agent.py
+curl -fsSL https://raw.githubusercontent.com/veldan123/ai-agent/main/requirements.txt -o requirements.txt
 
 # Install dependencies
 echo ""
