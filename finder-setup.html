@@ -160,88 +160,34 @@
 <!-- ══ MAC ══ -->
 <div id="os-mac" class="os-section visible">
 
-  <p class="section-label">Choose what to install</p>
-  <div class="components">
-
-    <div class="comp-row checked" id="mac-python" onclick="toggle(this)">
-      <div class="comp-check">
-        <svg width="13" height="13" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </div>
-      <div class="comp-info">
-        <div class="comp-name">Python 3 <span class="tag tag-req">Required</span></div>
-        <div class="comp-desc">The programming language the agent runs on. Uncheck if you already have Python 3 installed.</div>
-      </div>
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-body">
+      <h3>Open Terminal</h3>
+      <p>Press <strong>Cmd + Space</strong>, type <strong>Terminal</strong>, press Enter.</p>
     </div>
-
-    <div class="comp-row checked" id="mac-ollama" onclick="toggle(this)">
-      <div class="comp-check">
-        <svg width="13" height="13" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </div>
-      <div class="comp-info">
-        <div class="comp-name">Ollama <span class="tag tag-req">Required</span></div>
-        <div class="comp-desc">Runs the AI locally. Uncheck if Ollama is already installed on your Mac.</div>
-      </div>
-    </div>
-
-    <div class="comp-row checked" id="mac-model" onclick="toggle(this)">
-      <div class="comp-check">
-        <svg width="13" height="13" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </div>
-      <div class="comp-info">
-        <div class="comp-name">AI Model — qwen2.5:7b <span class="tag tag-size">~4 GB</span> <span class="tag tag-req">Required</span></div>
-        <div class="comp-desc">The AI brain. Only downloaded once. Uncheck if you've already pulled qwen2.5:7b in Ollama.</div>
-      </div>
-    </div>
-
-    <div class="comp-row checked disabled">
-      <div class="comp-check">
-        <svg width="13" height="13" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </div>
-      <div class="comp-info">
-        <div class="comp-name">Client Finder Agent <span class="tag tag-always">Always included</span></div>
-        <div class="comp-desc">The AI agent script that finds client contacts — always downloaded and launched.</div>
-      </div>
-    </div>
-
   </div>
 
-  <div class="mac-warning visible">
-    <div class="mac-warning-title">⚠️ Important — do not double-click the file</div>
-    <ol>
-      <li>After downloading, find <strong>install_finder.command</strong> in your Downloads folder</li>
-      <li><strong>Right-click</strong> the file → <strong>Open With</strong> → <strong>Terminal</strong></li>
-      <li>If a security popup appears → click <strong>Open</strong></li>
-      <li>Terminal runs the installer automatically — do not close it</li>
-    </ol>
+  <div class="step">
+    <div class="step-num">2</div>
+    <div class="step-body">
+      <h3>Paste this command and press Enter</h3>
+      <p>It installs everything automatically — Python, Ollama, the AI model, and the agent. First run takes ~5–10 min. Already have some installed? No problem, it skips what's already there.</p>
+      <div style="background:#161b22;border:1px solid #21262d;border-radius:10px;padding:14px 18px;margin:12px 0;position:relative;">
+        <code id="mac-cmd" style="font-family:'SF Mono','Fira Code',monospace;font-size:12px;color:#56d4dd;display:block;line-height:1.8;word-break:break-all;">curl -fsSL https://raw.githubusercontent.com/veldan123/ai-agent/main/install_finder_mac.sh | bash</code>
+        <button onclick="copyMacCmd()" id="mac-copy-btn" style="position:absolute;top:10px;right:10px;background:#21262d;border:1px solid #30363d;color:#8b949e;font-size:11px;font-weight:600;padding:4px 10px;border-radius:6px;cursor:pointer;transition:all 0.15s;">Copy</button>
+      </div>
+      <p>The agent will launch in Terminal and ask what business you're in.</p>
+    </div>
   </div>
 
-  <button class="dl-btn" onclick="startDownload('mac')">
-    ⬇ &nbsp;Download Installer for Mac
-  </button>
-
-  <div class="after-steps" id="mac-after" style="display:none">
-    <p class="section-label" style="margin-top:32px">After downloading</p>
-    <div class="step">
-      <div class="step-num">1</div>
-      <div class="step-body">
-        <h3>Find the downloaded file</h3>
-        <p>Look in your <strong>Downloads</strong> folder for <strong>install_finder.command</strong>.</p>
-      </div>
-    </div>
-    <div class="step">
-      <div class="step-num">2</div>
-      <div class="step-body">
-        <h3>Right-click → Open With → Terminal</h3>
-        <p><strong>Do not double-click</strong> — VS Code may open the file instead of running it.</p>
-        <p style="margin-top:8px">Right-click <strong>install_finder.command</strong> → <strong>Open With</strong> → <strong>Terminal</strong>. If Terminal isn't listed, click <strong>Other…</strong> and find Terminal in Applications → Utilities.</p>
-        <div class="tip">💡 If a security popup appears → click <strong>Open</strong> to continue.</div>
-      </div>
-    </div>
-    <div class="step">
-      <div class="step-num">3</div>
-      <div class="step-body">
-        <h3>Run again anytime</h3>
-        <p>Double-click <strong>install_finder.command</strong> again — it skips setup and launches straight to the agent.</p>
+  <div class="step">
+    <div class="step-num">3</div>
+    <div class="step-body">
+      <h3>Open it again anytime</h3>
+      <p>Open Terminal and run:</p>
+      <div style="background:#161b22;border:1px solid #21262d;border-radius:10px;padding:12px 18px;margin-top:10px;">
+        <code style="font-family:'SF Mono','Fira Code',monospace;font-size:12px;color:#56d4dd;">python3 ~/contact_finder/agent.py</code>
       </div>
     </div>
   </div>
@@ -336,6 +282,15 @@
 </footer>
 
 <script>
+  function copyMacCmd() {
+    const text = document.getElementById("mac-cmd").textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.getElementById("mac-copy-btn");
+      btn.textContent = "Copied!"; btn.style.background = "#166534"; btn.style.color = "#4ade80";
+      setTimeout(() => { btn.textContent = "Copy"; btn.style.background = ""; btn.style.color = ""; }, 2000);
+    });
+  }
+
   let pendingOS = null;
   const AGENT_URL = "https://raw.githubusercontent.com/veldan123/ai-agent/main/agent.py";
 
