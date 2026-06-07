@@ -89,7 +89,7 @@
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
       gap: 24px;
-      max-width: 780px;
+      max-width: 1140px;
       width: 100%;
     }
 
@@ -119,6 +119,7 @@
 
     .card-finder::before  { background: radial-gradient(ellipse at top left, #1e3a6e22, transparent 60%); }
     .card-chatbot::before { background: radial-gradient(ellipse at top left, #3b1e6e22, transparent 60%); }
+    .card-email::before   { background: radial-gradient(ellipse at top left, #14532d22, transparent 60%); }
 
     .card:hover {
       transform: translateY(-4px);
@@ -127,6 +128,7 @@
     .card:hover::before { opacity: 1; }
     .card-finder:hover  { border-color: #2563eb; box-shadow: 0 20px 40px rgba(37,99,235,0.15); }
     .card-chatbot:hover { border-color: #7c3aed; box-shadow: 0 20px 40px rgba(124,58,237,0.15); }
+    .card-email:hover   { border-color: #16a34a; box-shadow: 0 20px 40px rgba(22,163,74,0.15); }
 
     .card-icon {
       width: 56px; height: 56px;
@@ -136,6 +138,7 @@
     }
     .card-finder  .card-icon { background: linear-gradient(135deg, #1d4ed8, #2563eb); }
     .card-chatbot .card-icon { background: linear-gradient(135deg, #6d28d9, #7c3aed); }
+    .card-email   .card-icon { background: linear-gradient(135deg, #15803d, #16a34a); }
 
     .card-tag {
       display: inline-block;
@@ -150,6 +153,7 @@
     }
     .card-finder  .card-tag { background: #1e3a6e; color: #60a5fa; }
     .card-chatbot .card-tag { background: #2e1a5e; color: #a78bfa; }
+    .card-email   .card-tag { background: #14532d; color: #4ade80; }
 
     .card h2 {
       font-size: 1.4rem;
@@ -184,6 +188,7 @@
     }
     .card-finder  .card-feature-dot { background: #2563eb; }
     .card-chatbot .card-feature-dot { background: #7c3aed; }
+    .card-email   .card-feature-dot { background: #16a34a; }
 
     .card-cta {
       display: flex;
@@ -209,6 +214,7 @@
     .card-btn:hover { opacity: 0.85; }
     .card-finder  .card-btn { background: linear-gradient(135deg, #1d4ed8, #2563eb); color: #fff; }
     .card-chatbot .card-btn { background: linear-gradient(135deg, #6d28d9, #7c3aed); color: #fff; }
+    .card-email   .card-btn { background: linear-gradient(135deg, #15803d, #16a34a); color: #fff; }
 
     .card-free {
       font-size: 12px;
@@ -279,6 +285,26 @@
         <div class="card-feature"><div class="card-feature-dot"></div>Streaming responses</div>
         <div class="card-feature"><div class="card-feature-dot"></div>Chat history sidebar</div>
         <div class="card-feature"><div class="card-feature-dot"></div>100% private & local</div>
+      </div>
+      <div class="card-cta">
+        <div class="card-btn">⬇ Download</div>
+        <div class="card-free">✦ Free</div>
+      </div>
+    </a>
+
+    <!-- Auto Email Sender -->
+    <a class="card card-email" href="email-setup.html">
+      <div>
+        <div class="card-tag">Outreach</div>
+      </div>
+      <div class="card-icon">📧</div>
+      <h2>Auto Email Sender</h2>
+      <p>Give it a contact list and your goal — AI writes a personalized draft for each person. You review, edit, and approve before anything sends.</p>
+      <div class="card-features">
+        <div class="card-feature"><div class="card-feature-dot"></div>AI-written, personalized drafts</div>
+        <div class="card-feature"><div class="card-feature-dot"></div>You approve every send</div>
+        <div class="card-feature"><div class="card-feature-dot"></div>Works with Client Finder's CSVs</div>
+        <div class="card-feature"><div class="card-feature-dot"></div>Mac & Windows</div>
       </div>
       <div class="card-cta">
         <div class="card-btn">⬇ Download</div>
