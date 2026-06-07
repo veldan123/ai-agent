@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Setup — AI Script Writer</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #0a0a0f; color: #e2e8f0; min-height: 100vh; }
+
+    nav { display: flex; align-items: center; justify-content: space-between; padding: 18px 40px; border-bottom: 1px solid #1e2a3a; }
+    .nav-logo { font-weight: 800; font-size: 1rem; color: #e879f9; text-decoration: none; }
+    .nav-link  { font-size: 0.85rem; color: #64748b; text-decoration: none; }
+    .nav-link:hover { color: #e879f9; }
+
+    .hero {
+      text-align: center;
+      padding: 56px 24px 36px;
+      background: radial-gradient(ellipse 70% 50% at 50% 0%, #4a044e 0%, #0a0a0f 70%);
+      border-bottom: 1px solid #1e2a3a;
+    }
+    h1 { font-size: clamp(1.8rem, 5vw, 2.6rem); font-weight: 800; letter-spacing: -0.5px; margin-bottom: 12px; color: #f1f5f9; }
+    h1 span { background: linear-gradient(135deg, #e879f9, #f0abfc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .subtitle { color: #64748b; font-size: 0.95rem; max-width: 480px; margin: 0 auto 24px; line-height: 1.6; }
+
+    .os-btns { display: flex; gap: 10px; justify-content: center; }
+    .os-btn { background: #0d1117; border: 1px solid #1e2a3a; color: #64748b; font-size: 0.9rem; font-weight: 600; padding: 10px 22px; border-radius: 99px; cursor: pointer; transition: all 0.15s; }
+    .os-btn.active { background: #c026d3; border-color: #c026d3; color: #fff; }
+
+    .content { max-width: 640px; margin: 0 auto; padding: 52px 24px 80px; }
+    .os-section { display: none; }
+    .os-section.visible { display: block; }
+
+    .section-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #64748b; margin-bottom: 14px; }
+
+    .components { display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; }
+
+    .comp-row {
+      display: flex; align-items: flex-start; gap: 14px;
+      background: #0d1117; border: 1px solid #1e2a3a;
+      border-radius: 14px; padding: 18px 20px;
+      cursor: pointer; transition: border-color 0.15s;
+      user-select: none;
+    }
+    .comp-row:hover { border-color: #c026d3; }
+    .comp-row.disabled { opacity: 0.5; cursor: not-allowed; }
+    .comp-row.disabled:hover { border-color: #1e2a3a; }
+
+    .comp-check {
+      width: 22px; height: 22px; border-radius: 6px;
+      border: 2px solid #334155; background: transparent;
+      flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+      margin-top: 1px; transition: all 0.15s;
+    }
+    .comp-row.checked .comp-check { background: #c026d3; border-color: #c026d3; }
+    .comp-check svg { display: none; }
+    .comp-row.checked .comp-check svg { display: block; }
+
+    .comp-info { flex: 1; }
+    .comp-name { font-size: 0.95rem; font-weight: 700; color: #f1f5f9; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .comp-desc { font-size: 0.82rem; color: #64748b; line-height: 1.5; }
+
+    .tag { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 5px; }
+    .tag-req    { background: #2a1a3a; color: #e879f9; }
+    .tag-size   { background: #2a1a0a; color: #fb923c; }
+    .tag-always { background: #3a0e3a; color: #e879f9; }
+
+    .dl-btn {
+      width: 100%;
+      background: linear-gradient(135deg, #c026d3, #e879f9);
+      color: #fff; border: none; border-radius: 14px;
+      padding: 18px 24px; font-size: 1rem; font-weight: 800;
+      cursor: pointer; transition: opacity 0.15s;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+    }
+    .dl-btn:hover { opacity: 0.85; }
+
+    .after-steps { margin-top: 32px; }
+    .step { display: flex; gap: 18px; margin-bottom: 14px; }
+    .step-num { min-width: 36px; height: 36px; background: linear-gradient(135deg, #c026d3, #e879f9); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; color: #fff; flex-shrink: 0; }
+    .step-body { background: #0d1117; border: 1px solid #1e2a3a; border-radius: 12px; padding: 16px 20px; flex: 1; }
+    .step-body h3 { font-size: 0.92rem; font-weight: 700; color: #f1f5f9; margin-bottom: 4px; }
+    .step-body p  { font-size: 0.83rem; color: #64748b; line-height: 1.6; }
+    .tip { background: #3b0a3f; border: 1px solid #4a044e; border-radius: 10px; padding: 12px 16px; font-size: 0.83rem; color: #f0abfc; margin-top: 10px; }
+
+    /* ── Warning modal ── */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.8); backdrop-filter: blur(6px);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 100; padding: 24px;
+      opacity: 0; pointer-events: none; transition: opacity 0.2s;
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
+    .modal {
+      background: #0d1117; border: 1px solid #1e2a3a;
+      border-radius: 18px; padding: 36px; max-width: 460px; width: 100%;
+      transform: translateY(16px); transition: transform 0.2s;
+    }
+    .modal-overlay.open .modal { transform: translateY(0); }
+    .modal-icon { font-size: 2.2rem; margin-bottom: 14px; }
+    .modal h2 { font-size: 1.15rem; font-weight: 800; color: #f1f5f9; margin-bottom: 10px; }
+    .modal p { font-size: 0.88rem; color: #64748b; line-height: 1.7; margin-bottom: 6px; }
+    .modal-missing { display: flex; flex-wrap: wrap; gap: 6px; margin: 14px 0; }
+    .modal-pill { background: #2a0a0a; border: 1px solid #7f1d1d; color: #f87171; font-size: 12px; font-weight: 700; padding: 4px 12px; border-radius: 99px; }
+    .modal-btns { display: flex; gap: 10px; margin-top: 22px; }
+    .modal-back { flex: 1; background: #161b22; border: 1px solid #1e2a3a; color: #94a3b8; font-size: 0.88rem; font-weight: 700; padding: 12px; border-radius: 10px; cursor: pointer; transition: all 0.15s; }
+    .modal-back:hover { border-color: #334155; color: #f1f5f9; }
+    .modal-continue { flex: 1; background: #7f1d1d; border: 1px solid #991b1b; color: #fca5a5; font-size: 0.88rem; font-weight: 700; padding: 12px; border-radius: 10px; cursor: pointer; transition: all 0.15s; }
+    .modal-continue:hover { background: #991b1b; color: #fff; }
+
+    footer { text-align: center; padding: 24px; font-size: 12px; color: #334155; border-top: 1px solid #1e2a3a; }
+    footer a { color: #e879f9; text-decoration: none; }
+  </style>
+</head>
+<body>
+
+<!-- Warning Modal -->
+<div class="modal-overlay" id="warningModal">
+  <div class="modal">
+    <div class="modal-icon">⚠️</div>
+    <h2>Some required components are unchecked</h2>
+    <p>You unchecked the following — the tool <strong>may not work</strong> without them:</p>
+    <div class="modal-missing" id="missingList"></div>
+    <p>If you already have these installed on your computer, that's fine. Otherwise the tool won't start.</p>
+    <div class="modal-btns">
+      <button class="modal-back" onclick="closeWarning()">← Go back</button>
+      <button class="modal-continue" onclick="confirmDownload()">Continue anyway</button>
+    </div>
+  </div>
+</div>
+
+<nav>
+  <a class="nav-logo" href="index.html">← AI Tools</a>
+  <a class="nav-link" href="https://github.com/veldan123/ai-agent" target="_blank">GitHub</a>
+</nav>
+
+<div class="hero">
+  <h1>Set up <span>AI Script Writer</span></h1>
+  <p class="subtitle">Describe what you want automated — AI writes a complete, working script in Python, Bash, or JavaScript and saves it as a ready-to-run file on your computer.</p>
+  <div class="os-btns">
+    <button onclick="showOS('mac')" id="btn-mac" class="os-btn active">🍎 Mac</button>
+    <button onclick="showOS('win')" id="btn-win" class="os-btn">🪟 Windows</button>
+  </div>
+</div>
+
+<div class="content">
+
+<!-- ══ MAC ══ -->
+<div id="os-mac" class="os-section visible">
+
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-body">
+      <h3>Open Terminal</h3>
+      <p>Press <strong>Cmd + Space</strong>, type <strong>Terminal</strong>, press Enter.</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">2</div>
+    <div class="step-body">
+      <h3>Paste this command and press Enter</h3>
+      <p>It installs everything automatically — Python, Ollama, the AI model, and the tool. First run takes ~5–10 min. Already have some installed? It skips what's already there.</p>
+      <div style="background:#161b22;border:1px solid #21262d;border-radius:10px;padding:14px 18px;margin:12px 0;position:relative;">
+        <code id="mac-cmd" style="font-family:'SF Mono','Fira Code',monospace;font-size:12px;color:#e879f9;display:block;line-height:1.8;word-break:break-all;">curl -fsSL https://raw.githubusercontent.com/veldan123/ai-agent/main/install_script_writer_mac.sh | bash</code>
+        <button onclick="copyMacCmd()" id="mac-copy-btn" style="position:absolute;top:10px;right:10px;background:#21262d;border:1px solid #30363d;color:#8b949e;font-size:11px;font-weight:600;padding:4px 10px;border-radius:6px;cursor:pointer;transition:all 0.15s;">Copy</button>
+      </div>
+      <p>It'll ask what the script should do and which language to use — then it writes the code, checks that it's valid, and saves it ready to run.</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">3</div>
+    <div class="step-body">
+      <h3>Open it again anytime</h3>
+      <p>Open Terminal and run:</p>
+      <div style="background:#161b22;border:1px solid #21262d;border-radius:10px;padding:12px 18px;margin-top:10px;">
+        <code style="font-family:'SF Mono','Fira Code',monospace;font-size:12px;color:#e879f9;">python3 ~/script_writer/agent.py</code>
+      </div>
+      <div class="tip">💡 Already installed? Re-run the command from step 2 to update to the latest version.</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══ WINDOWS ══ -->
+<div id="os-win" class="os-section">
+
+  <p class="section-label">Choose what to install</p>
+  <div class="components">
+
+    <div class="comp-row checked" id="win-python" onclick="toggle(this)">
+      <div class="comp-check">
+        <svg width="13" height="13" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="comp-info">
+        <div class="comp-name">Python 3 <span class="tag tag-req">Required</span></div>
+        <div class="comp-desc">Needed to run the tool. Uncheck if Python 3 is already installed. Make sure "Add Python to PATH" was ticked during install.</div>
+      </div>
+    </div>
+
+    <div class="comp-row checked" id="win-ollama" onclick="toggle(this)">
+      <div class="comp-check">
+        <svg width="13" height="13" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="comp-info">
+        <div class="comp-name">Ollama <span class="tag tag-req">Required</span></div>
+        <div class="comp-desc">Runs the AI locally. Uncheck if Ollama is already installed on your PC.</div>
+      </div>
+    </div>
+
+    <div class="comp-row checked" id="win-model" onclick="toggle(this)">
+      <div class="comp-check">
+        <svg width="13" height="13" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="comp-info">
+        <div class="comp-name">AI Model — gemma3:4b <span class="tag tag-size">~3 GB</span> <span class="tag tag-req">Required</span></div>
+        <div class="comp-desc">The AI brain that writes your scripts. Only downloaded once. Uncheck if you've already pulled gemma3:4b in Ollama.</div>
+      </div>
+    </div>
+
+    <div class="comp-row checked disabled">
+      <div class="comp-check">
+        <svg width="13" height="13" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="comp-info">
+        <div class="comp-name">AI Script Writer <span class="tag tag-always">Always included</span></div>
+        <div class="comp-desc">The tool itself — always downloaded and launched.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <button class="dl-btn" onclick="startDownload('win')">
+    ⬇ &nbsp;Download Installer for Windows
+  </button>
+
+  <div class="after-steps" id="win-after" style="display:none">
+    <p class="section-label" style="margin-top:32px">After downloading</p>
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <h3>Find the downloaded file</h3>
+        <p>Look in your <strong>Downloads</strong> folder for <strong>install_script_writer.bat</strong>.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <h3>Right-click it → Run</h3>
+        <p><strong>Do not double-click</strong> — if VS Code is installed it will open the file instead of running it.</p>
+        <p style="margin-top:8px">Instead: <strong>right-click</strong> the file → select <strong>"Open with"</strong> → <strong>"Windows Command Processor"</strong>. A black window will open and run the installer automatically.</p>
+        <div class="tip">💡 If you see a blue SmartScreen warning → click <strong>More info</strong> → <strong>Run anyway</strong>.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <h3>Run again anytime</h3>
+        <p>Right-click <strong>install_script_writer.bat</strong> → <strong>"Open with"</strong> → <strong>"Windows Command Processor"</strong>.</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<footer>
+  <a href="index.html">← Back to home</a> &nbsp;·&nbsp;
+  <a href="https://github.com/veldan123/ai-agent" target="_blank">GitHub</a>
+</footer>
+
+<script>
+  function copyMacCmd() {
+    const text = document.getElementById("mac-cmd").textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.getElementById("mac-copy-btn");
+      btn.textContent = "Copied!"; btn.style.background = "#4a044e"; btn.style.color = "#e879f9";
+      setTimeout(() => { btn.textContent = "Copy"; btn.style.background = ""; btn.style.color = ""; }, 2000);
+    });
+  }
+
+  let pendingOS = null;
+  const AGENT_URL = "https://raw.githubusercontent.com/veldan123/ai-agent/main/script_writer/agent.py";
+
+  function showOS(os) {
+    document.getElementById("os-mac").classList.toggle("visible", os === "mac");
+    document.getElementById("os-win").classList.toggle("visible", os === "win");
+    document.getElementById("btn-mac").classList.toggle("active", os === "mac");
+    document.getElementById("btn-win").classList.toggle("active", os === "win");
+  }
+  window.addEventListener("load", () => showOS(navigator.userAgent.includes("Win") ? "win" : "mac"));
+
+  function toggle(row) {
+    if (row.classList.contains("disabled")) return;
+    row.classList.toggle("checked");
+  }
+
+  function startDownload(os) {
+    pendingOS = os;
+    const prefix = os === "mac" ? "mac" : "win";
+    const installPython = document.getElementById(prefix + "-python").classList.contains("checked");
+    const installOllama = document.getElementById(prefix + "-ollama").classList.contains("checked");
+    const installModel  = document.getElementById(prefix + "-model").classList.contains("checked");
+
+    const missing = [];
+    if (!installPython) missing.push("Python 3");
+    if (!installOllama) missing.push("Ollama");
+    if (!installModel)  missing.push("AI Model (gemma3:4b)");
+
+    if (missing.length > 0) {
+      document.getElementById("missingList").innerHTML = missing.map(m => `<span class="modal-pill">${m}</span>`).join("");
+      document.getElementById("warningModal").classList.add("open");
+    } else {
+      doDownload(os, installPython, installOllama, installModel);
+    }
+  }
+
+  function closeWarning() {
+    document.getElementById("warningModal").classList.remove("open");
+    pendingOS = null;
+  }
+
+  function confirmDownload() {
+    document.getElementById("warningModal").classList.remove("open");
+    const os = pendingOS;
+    const prefix = os === "mac" ? "mac" : "win";
+    doDownload(
+      os,
+      document.getElementById(prefix + "-python").classList.contains("checked"),
+      document.getElementById(prefix + "-ollama").classList.contains("checked"),
+      document.getElementById(prefix + "-model").classList.contains("checked")
+    );
+  }
+
+  function doDownload(os, python, ollama, model) {
+    const script   = os === "mac" ? buildMac(python, ollama, model) : buildWin(python, ollama, model);
+    const filename = os === "mac" ? "install_script_writer.command" : "install_script_writer.bat";
+    const blob = new Blob([script], { type: "text/plain" });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement("a");
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    const afterEl = document.getElementById(os + "-after");
+    afterEl.style.display = "block";
+    afterEl.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function buildMac(python, ollama, model) {
+    let s = `#!/bin/bash\nclear\necho ""\necho "  ╔═══════════════════════════════════════════╗"\necho "  ║  AI Script Writer — Setup                  ║"\necho "  ╚═══════════════════════════════════════════╝"\necho ""\n\n`;
+
+    if (python) {
+      s += `# ── Homebrew ──\nif ! command -v brew &>/dev/null; then\n    echo "  Installing Homebrew..."\n    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"\n    [ -f /opt/homebrew/bin/brew ] && eval "$(/opt/homebrew/bin/brew shellenv)"\nfi\n\n# ── Python ──\nif ! command -v python3 &>/dev/null; then\n    echo "  Installing Python..."\n    brew install python3\nfi\necho "  ✓ Python: $(python3 --version)"\n\n`;
+    }
+
+    if (ollama) {
+      s += `# ── Ollama ──\nif ! command -v ollama &>/dev/null; then\n    echo "  Installing Ollama..."\n    brew install ollama\nfi\necho "  ✓ Ollama ready"\n\n`;
+    }
+
+    s += `# ── Start Ollama ──\necho "  Starting Ollama..."\npkill ollama 2>/dev/null; sleep 1\nollama serve &>/dev/null &\necho "  Waiting for Ollama to be ready..."\nfor i in $(seq 1 30); do\n    ollama list &>/dev/null && break\n    sleep 1\ndone\n\n`;
+
+    if (model) {
+      s += `# ── AI Model ──\nif ! ollama list 2>/dev/null | grep -q "gemma3:4b"; then\n    echo "  Downloading AI model (~3GB, one-time)..."\n    ollama pull gemma3:4b\nfi\necho "  ✓ Model ready"\n\n`;
+    }
+
+    s += `# ── Python packages ──\necho "  Installing packages..."\npython3 -m pip install -q ollama rich --break-system-packages\necho "  ✓ Packages installed"\n\n`;
+    s += `# ── Download tool ──\necho "  Downloading AI Script Writer..."\nmkdir -p ~/script_writer\ncurl -fsSL "${AGENT_URL}" -o ~/script_writer/agent.py\necho "  ✓ Ready"\n\n`;
+    s += `echo ""\necho "  ✓ Done! Launching AI Script Writer..."\necho ""\npython3 ~/script_writer/agent.py || {\n    echo ""\n    echo "  ⚠️  Something didn't finish cleanly on this run."\n    echo "  Please run this installer again — it almost always works the 2nd time."\n    echo ""\n}\n`;
+    return s;
+  }
+
+  function buildWin(python, ollama, model) {
+    let s = `@echo off\ntitle AI Script Writer Setup\ncls\necho.\necho   =====================================\necho   AI Script Writer Setup\necho   =====================================\necho.\n\n`;
+
+    if (python) {
+      s += `:: ── Python ──\npython --version >nul 2>&1\nif errorlevel 1 (\n    echo   Python not found. Opening download page...\n    start https://www.python.org/downloads/\n    echo   Install Python, check "Add Python to PATH", then re-run this file.\n    pause\n    exit /b 1\n)\necho   ✓ Python found\n\n`;
+    }
+
+    if (ollama) {
+      s += `:: ── Ollama ──\nollama --version >nul 2>&1\nif errorlevel 1 (\n    echo   Ollama not found. Opening download page...\n    start https://ollama.com/download\n    echo   Install Ollama, then re-run this file.\n    pause\n    exit /b 1\n)\necho   ✓ Ollama found\n\n`;
+    }
+
+    s += `:: ── Start Ollama ──\necho   Starting Ollama...\ntaskkill /f /im "ollama.exe" >nul 2>&1\ntimeout /t 1 /nobreak >nul\nstart /b ollama serve\ntimeout /t 4 /nobreak >nul\n\n`;
+
+    if (model) {
+      s += `:: ── AI Model ──\necho   Downloading AI model (~3GB, one-time)...\nollama pull gemma3:4b\necho   ✓ Model ready\n\n`;
+    }
+
+    s += `:: ── Packages ──\necho   Installing packages...\npython -m pip install -q ollama rich\necho   ✓ Packages installed\n\n`;
+    s += `:: ── Download tool ──\necho   Downloading AI Script Writer...\nif not exist "%USERPROFILE%\\script_writer" mkdir "%USERPROFILE%\\script_writer"\ncurl -fsSL "${AGENT_URL}" -o "%USERPROFILE%\\script_writer\\agent.py"\necho   ✓ Ready\n\n`;
+    s += `echo.\necho   ✓ Done! Launching AI Script Writer...\necho.\npython "%USERPROFILE%\\script_writer\\agent.py"\npause\n`;
+    return s;
+  }
+</script>
+</body>
+</html>

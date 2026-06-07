@@ -123,6 +123,7 @@
     .card-model::before   { background: radial-gradient(ellipse at top left, #0e749022, transparent 60%); }
     .card-proposal::before { background: radial-gradient(ellipse at top left, #78350f22, transparent 60%); }
     .card-meeting::before { background: radial-gradient(ellipse at top left, #4c051922, transparent 60%); }
+    .card-script::before { background: radial-gradient(ellipse at top left, #701a7522, transparent 60%); }
 
     .card:hover {
       transform: translateY(-4px);
@@ -135,6 +136,7 @@
     .card-model:hover   { border-color: #22d3ee; box-shadow: 0 20px 40px rgba(34,211,238,0.15); }
     .card-proposal:hover { border-color: #d97706; box-shadow: 0 20px 40px rgba(217,119,6,0.15); }
     .card-meeting:hover { border-color: #e11d48; box-shadow: 0 20px 40px rgba(225,29,72,0.15); }
+    .card-script:hover { border-color: #c026d3; box-shadow: 0 20px 40px rgba(192,38,211,0.15); }
 
     .card-icon {
       width: 56px; height: 56px;
@@ -148,6 +150,7 @@
     .card-model   .card-icon { background: linear-gradient(135deg, #0e7490, #22d3ee); }
     .card-proposal .card-icon { background: linear-gradient(135deg, #b45309, #d97706); }
     .card-meeting .card-icon { background: linear-gradient(135deg, #be123c, #e11d48); }
+    .card-script .card-icon { background: linear-gradient(135deg, #a21caf, #c026d3); }
 
     .card-tag {
       display: inline-block;
@@ -166,6 +169,7 @@
     .card-model   .card-tag { background: #0e3a4a; color: #22d3ee; }
     .card-proposal .card-tag { background: #3a2a0e; color: #fbbf24; }
     .card-meeting .card-tag { background: #4c0519; color: #fb7185; }
+    .card-script .card-tag { background: #4a044e; color: #e879f9; }
 
     .card h2 {
       font-size: 1.4rem;
@@ -204,6 +208,7 @@
     .card-model   .card-feature-dot { background: #22d3ee; }
     .card-proposal .card-feature-dot { background: #d97706; }
     .card-meeting .card-feature-dot { background: #e11d48; }
+    .card-script .card-feature-dot { background: #c026d3; }
 
     .card-cta {
       display: flex;
@@ -233,6 +238,7 @@
     .card-model   .card-btn { background: linear-gradient(135deg, #0e7490, #22d3ee); color: #04222b; }
     .card-proposal .card-btn { background: linear-gradient(135deg, #b45309, #d97706); color: #fff; }
     .card-meeting .card-btn { background: linear-gradient(135deg, #be123c, #e11d48); color: #fff; }
+    .card-script .card-btn { background: linear-gradient(135deg, #a21caf, #c026d3); color: #fff; }
 
     .card-free {
       font-size: 12px;
@@ -382,6 +388,26 @@
         <div class="card-feature"><div class="card-feature-dot"></div>Summary, decisions & action items</div>
         <div class="card-feature"><div class="card-feature-dot"></div>Paste text or load a transcript file</div>
         <div class="card-feature"><div class="card-feature-dot"></div>Saves ready-to-share text files</div>
+        <div class="card-feature"><div class="card-feature-dot"></div>Mac & Windows</div>
+      </div>
+      <div class="card-cta">
+        <div class="card-btn">⬇ Download</div>
+        <div class="card-free">✦ Free</div>
+      </div>
+    </a>
+
+    <!-- AI Script Writer -->
+    <a class="card card-script" href="script-setup.html">
+      <div>
+        <div class="card-tag">Automation</div>
+      </div>
+      <div class="card-icon">💻</div>
+      <h2>AI Script Writer</h2>
+      <p>Describe what you want automated — AI writes a complete Python, Bash, or JavaScript script, checks that it runs, and saves it ready to use.</p>
+      <div class="card-features">
+        <div class="card-feature"><div class="card-feature-dot"></div>Writes & syntax-checks real code</div>
+        <div class="card-feature"><div class="card-feature-dot"></div>Self-corrects on errors</div>
+        <div class="card-feature"><div class="card-feature-dot"></div>Saves ready-to-run files</div>
         <div class="card-feature"><div class="card-feature-dot"></div>Mac & Windows</div>
       </div>
       <div class="card-cta">
