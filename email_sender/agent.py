@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import os, sys, json, csv, glob, re, smtplib, ssl, time, random
+import os, sys, json, csv, glob, re, smtplib, ssl, time, random, urllib.request
 from email.mime.text import MIMEText
 from datetime import datetime
 
@@ -10,10 +10,27 @@ from rich.text import Text
 from rich.prompt import Prompt
 from rich import box
 
+VERSION     = "1.0.0"
+VERSION_URL = "https://raw.githubusercontent.com/veldan123/ai-agent/main/email_sender/version.txt"
+APP_URL     = "https://raw.githubusercontent.com/veldan123/ai-agent/main/email_sender/agent.py"
+APP_PATH    = os.path.expanduser("~/email_sender/agent.py")
+
 MODEL       = "gemma3:4b"
 console     = Console()
 CONFIG_PATH = os.path.expanduser("~/email_sender/config.json")
 CONTACT_DIR = os.path.expanduser("~/contact_finder")
+
+
+def check_update():
+    try:
+        with urllib.request.urlopen(VERSION_URL, timeout=5) as r:
+            remote = r.read().decode().strip()
+        if remote != VERSION:
+            console.print(f"  [cyan]⬆ Updating {VERSION} → {remote}...[/cyan]")
+            urllib.request.urlretrieve(APP_URL, APP_PATH)
+            os.execv(sys.executable, [sys.executable, APP_PATH])
+    except Exception:
+        pass  # No internet or GitHub down — just continue with current version
 
 SMTP_PRESETS = {
     "gmail.com":      ("smtp.gmail.com", 587),
@@ -379,6 +396,7 @@ def main():
 
 
 if __name__ == "__main__":
+    check_update()
     try:
         main()
     except KeyboardInterrupt:
