@@ -10,7 +10,7 @@ from rich.prompt import Prompt
 from rich.align import Align
 from rich import box
 
-VERSION     = "1.0.1"
+VERSION     = "1.0.2"
 VERSION_URL = "https://raw.githubusercontent.com/veldan123/ai-agent/main/model_gen/version.txt"
 APP_URL     = "https://raw.githubusercontent.com/veldan123/ai-agent/main/model_gen/agent.py"
 APP_PATH    = os.path.expanduser("~/model_gen/agent.py")
@@ -120,7 +120,7 @@ no markdown code fences, just raw code starting from the first line."""
 You may ONLY use these OpenSCAD features:
 - Primitives: cube(), cylinder(), sphere(), polygon(), polyhedron()
 - Transforms: translate(), rotate(), scale(), mirror(), resize()
-- Booleans: union(), difference(), intersection()
+- Booleans: union(), difference(), intersection(), hull()
 - Extrusions: linear_extrude(), rotate_extrude()
 - $fn for facet smoothness on curves
 
@@ -129,9 +129,13 @@ Rules:
    of this kind (e.g. a coffee mug is roughly 80mm tall, a phone stand 100mm wide)
 2. Keep the model centered near the origin
 3. Use difference() to cut holes, cavities, and cutouts
-4. Set $fn = 64; near the top so curved surfaces render smoothly
-5. Add short // comments explaining each part
-6. Output ONLY valid OpenSCAD code — no explanations, no markdown fences,
+4. If the object has rounded or organic parts (e.g. limbs, handles, blobs),
+   use hull() around two overlapping spheres/cylinders to make a smooth
+   tapered shape, and overlap parts generously so they fuse — don't place
+   separate primitives side by side expecting them to look connected
+5. Set $fn = 64; near the top so curved surfaces render smoothly
+6. Add short // comments explaining each part
+7. Output ONLY valid OpenSCAD code — no explanations, no markdown fences,
    just the raw code starting from the first line"""
 
 
@@ -225,7 +229,12 @@ def main():
         sys.exit(1)
 
     os.makedirs(OUTPUT_DIR, exist_ok=True)
-    console.print(f"  [dim]Models are saved to {OUTPUT_DIR}[/dim]\n")
+    console.print(f"  [dim]Models are saved to {OUTPUT_DIR}[/dim]")
+    console.print(
+        "  [dim]Best results: geometric / functional objects — stands, holders,\n"
+        "  boxes, vases, brackets, gears. Organic shapes (animals, people)\n"
+        "  come out more abstract since the AI is drafting raw CAD code.[/dim]\n"
+    )
 
     while True:
         description = Prompt.ask(
