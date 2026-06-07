@@ -83,7 +83,7 @@ def banner():
     console.print()
     boot_sequence()
     console.print(Panel(
-        Align.center(Text("🧊  3D Model Generator", style="bold cyan")),
+        Align.center(Text("🧊  3D Model Generator by Anvil AI", style="bold cyan")),
         subtitle="Describe an object — AI designs it and exports a ready-to-print STL",
         box=box.DOUBLE,
         border_style="cyan",

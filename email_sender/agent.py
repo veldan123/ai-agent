@@ -64,7 +64,7 @@ def banner():
     console.print()
     boot_sequence()
     console.print(Panel(
-        Align_center("📧  Auto Email Sender"),
+        Align_center("📧  Auto Email Sender by Anvil AI"),
         subtitle="AI writes the draft — you decide what gets sent",
         box=box.DOUBLE,
         border_style="green",

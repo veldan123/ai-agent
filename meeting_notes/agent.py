@@ -54,7 +54,7 @@ def banner():
     console.print()
     boot_sequence()
     console.print(Panel(
-        Align.center(Text("📋  Meeting & Call Notes Summarizer", style="bold blue")),
+        Align.center(Text("📋  Meeting & Call Notes Summarizer by Anvil AI", style="bold blue")),
         subtitle="Paste a transcript — AI pulls out the summary, decisions & action items",
         box=box.DOUBLE,
         border_style="blue",

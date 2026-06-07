@@ -53,7 +53,7 @@ def banner():
     console.print()
     boot_sequence()
     console.print(Panel(
-        Align.center(Text("🧾  Proposal & Quote Writer", style="bold yellow")),
+        Align.center(Text("🧾  Proposal & Quote Writer by Anvil AI", style="bold yellow")),
         subtitle="Describe the job — AI drafts a client-ready proposal in seconds",
         box=box.DOUBLE,
         border_style="yellow",

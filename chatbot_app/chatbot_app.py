@@ -265,7 +265,7 @@ HTML = """<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<title>AI Chatbot</title>
+<title>AI Chatbot by Anvil AI</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#0a0a0f;color:#e2e8f0;height:100vh;overflow:hidden}
@@ -712,6 +712,6 @@ if __name__ == "__main__":
     threading.Thread(target=run, daemon=True).start()
     time.sleep(1)
 
-    webview.create_window("AI Chatbot", f"http://127.0.0.1:{port}",
+    webview.create_window("AI Chatbot by Anvil AI", f"http://127.0.0.1:{port}",
                           width=1020, height=720, resizable=True, min_size=(600, 420))
     webview.start()

@@ -51,6 +51,7 @@ def show_welcome():
     title.append("   ╚═════╝╚══════╝╚═╝╚══════╝╚═╝  ╚═══╝   ╚═╝  \n", style="bold magenta")
     title.append("\n")
     title.append("        F I N D E R   A G E N T\n", style="bold white")
+    title.append("              by Anvil AI\n", style="dim cyan")
     title.append("\n")
 
     panel = Panel(
