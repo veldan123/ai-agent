@@ -11,7 +11,7 @@ from rich.align import Align
 from rich.syntax import Syntax
 from rich import box
 
-VERSION     = "1.0.0"
+VERSION     = "1.0.1"
 VERSION_URL = "https://raw.githubusercontent.com/veldan123/ai-agent/main/script_writer/version.txt"
 APP_URL     = "https://raw.githubusercontent.com/veldan123/ai-agent/main/script_writer/agent.py"
 APP_PATH    = os.path.expanduser("~/script_writer/agent.py")
@@ -25,7 +25,11 @@ LANGUAGES = {
     "1": {"name": "Python",            "ext": "py", "lexer": "python",     "shebang": "#!/usr/bin/env python3", "executable": True},
     "2": {"name": "Bash / Shell",      "ext": "sh", "lexer": "bash",       "shebang": "#!/bin/bash",            "executable": True},
     "3": {"name": "JavaScript (Node)", "ext": "js", "lexer": "javascript", "shebang": None,                     "executable": False},
+    "4": {"name": "HTML / Web Page",   "ext": "html", "lexer": "html",     "shebang": None,                     "executable": False},
 }
+
+VOID_TAGS = {"area", "base", "br", "col", "embed", "hr", "img", "input",
+             "link", "meta", "param", "source", "track", "wbr"}
 
 
 def check_update():
@@ -73,9 +77,10 @@ def banner():
 # ── Getting the request ──
 def get_request():
     description = Prompt.ask(
-        "  [bold]What should the script do?[/bold]\n"
-        "  [dim]e.g. \"rename every file in a folder to lowercase\" or\n"
-        "  \"fetch a webpage and save its text to a file\"[/dim]\n  "
+        "  [bold]What do you want to build?[/bold]\n"
+        "  [dim]e.g. \"rename every file in a folder to lowercase\",\n"
+        "  \"fetch a webpage and save its text to a file\", or\n"
+        "  \"a simple landing page for a coffee shop\"[/dim]\n  "
     ).strip()
 
     console.print()
@@ -96,47 +101,65 @@ def strip_code_fences(text):
     return text.strip()
 
 
+def kind_of(lang):
+    return "web page" if lang["ext"] == "html" else "script"
+
+
 def build_prompt(description, lang, previous_code=None, error=None):
+    kind = kind_of(lang)
+
     if previous_code and error:
-        return f"""The following {lang['name']} script failed a syntax check:
+        return f"""The following {lang['name']} {kind} failed a check:
 
 {previous_code}
 
-The checker reported this error:
+The checker reported this:
 {error[:600]}
 
-Fix the script so it's syntactically valid, keeping the same goal
-("{description}"). Output ONLY the corrected {lang['name']} code — no
-explanations, no markdown code fences, just the raw code starting from
-the first line."""
+Fix it so it's valid, keeping the same goal ("{description}"). Output
+ONLY the corrected {lang['name']} code — no explanations, no markdown
+code fences, just the raw code starting from the first line."""
 
-    return f"""You are an expert {lang['name']} programmer. Write a complete, working
-{lang['name']} script that does the following:
+    rules = [
+        'It must be complete and ready to use as-is — no placeholders, '
+        'no "TODO", no "insert your code here"',
+        "Use only the standard library / built-in modules unless the task "
+        "clearly requires something else",
+        "Add short comments explaining the key parts",
+        "Briefly handle the obvious edge cases — don't over-engineer it",
+    ]
+    if lang["ext"] == "html":
+        rules.append(
+            "Make it a single, self-contained HTML file — put any CSS inside "
+            "a <style> tag and any JavaScript inside a <script> tag, so it "
+            "opens and works directly in a browser with no other files needed"
+        )
+    rules.append(
+        f"Output ONLY the raw {lang['name']} code — no explanations, no "
+        f"markdown code fences, just the code starting from the first line"
+    )
+    rules_text = "\n".join(f"{i}. {r}" for i, r in enumerate(rules, 1))
+
+    return f"""You are an expert {lang['name']} developer. Write a complete, working
+{lang['name']} {kind} that does the following:
 
 "{description}"
 
 Rules:
-1. The script must be complete and ready to run as-is — no placeholders,
-   no "TODO", no "insert your code here"
-2. Use only the standard library / built-in modules unless the task
-   clearly requires something else
-3. Add short comments explaining the key steps
-4. Briefly handle the obvious edge cases (missing files, bad input) —
-   don't over-engineer it
-5. Output ONLY the raw {lang['name']} code — no explanations, no markdown
-   code fences, just the code starting from the first line"""
+{rules_text}"""
 
 
 def build_revision_prompt(lang, current_code, feedback):
-    return f"""Here is a {lang['name']} script:
+    kind = kind_of(lang)
+    return f"""Here is a {lang['name']} {kind}:
 
 {current_code}
 
 The user wants this change: "{feedback}"
 
-Rewrite the script to make that change while keeping everything else
-working. Output ONLY the updated {lang['name']} code — no explanations,
-no markdown code fences, just the raw code starting from the first line."""
+Rewrite it to make that change while keeping everything else working.
+Output ONLY the updated {lang['name']} code — no explanations, no
+markdown code fences, just the raw code starting from the first line."""
 
 
 def ask_ai(prompt):
@@ -144,8 +167,46 @@ def ask_ai(prompt):
     return strip_code_fences(resp["message"]["content"])
 
 
+# ── Markup checking for HTML (balanced-tag check via the stdlib parser) ──
+def check_html_markup(code):
+    from html.parser import HTMLParser
+
+    stack, errors = [], []
+
+    class Checker(HTMLParser):
+        def handle_starttag(self, tag, attrs):
+            if tag not in VOID_TAGS:
+                stack.append(tag)
+
+        def handle_endtag(self, tag):
+            if tag in VOID_TAGS:
+                return
+            if stack and stack[-1] == tag:
+                stack.pop()
+            elif tag in stack:
+                while stack and stack[-1] != tag:  # browsers auto-close like this too
+                    stack.pop()
+                if stack:
+                    stack.pop()
+            else:
+                errors.append(f"</{tag}> has no matching opening tag")
+
+    try:
+        Checker().feed(code)
+    except Exception as e:
+        errors.append(str(e))
+
+    if stack:
+        errors.append("unclosed tag(s): " + ", ".join(f"<{t}>" for t in stack))
+
+    return (not errors), "; ".join(errors)
+
+
 # ── Syntax checking (no execution — just validates the code parses) ──
 def check_syntax(code, lang):
+    if lang["ext"] == "html":
+        return check_html_markup(code)
+
     fd, path = tempfile.mkstemp(suffix=f".{lang['ext']}")
     try:
         with os.fdopen(fd, "w", encoding="utf-8") as f:
@@ -293,12 +354,17 @@ def main():
 
             if action in ("a", "approve", ""):
                 path = save_script(description, lang, code)
+                if lang["ext"] == "html":
+                    hint = "Double-click the file to open it straight in your browser."
+                elif lang["executable"]:
+                    hint = "Open it in any text editor, or run it straight from the terminal — it’s already executable."
+                else:
+                    hint = "Open it in any text editor, or run it with the matching interpreter."
                 console.print()
                 console.print(Panel(
                     f"[bold green]✓ Saved![/bold green]\n\n"
                     f"File: [cyan]{path}[/cyan]\n\n"
-                    f"[dim]Open it in any text editor, or run it straight from the\n"
-                    f"terminal{' — it’s already executable' if lang['executable'] else ''}.[/dim]",
+                    f"[dim]{hint}[/dim]",
                     title="💻  Done", border_style="green", box=box.ROUNDED, padding=(1, 2),
                 ))
                 if Prompt.ask("\n  Open the folder with your scripts?", choices=["y", "n"], default="y") == "y":
