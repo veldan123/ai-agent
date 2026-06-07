@@ -94,7 +94,8 @@ def setup_email():
         console.print()
 
     console.print("  [dim](What you type/paste will be visible — that's normal here, app passwords are safe to show)[/dim]")
-    password = Prompt.ask("  App password / email password").strip()
+    console.print("  [dim](Pasting it with the spaces Google shows — like \"abcd efgh ijkl mnop\" — is fine, they're removed automatically)[/dim]")
+    password = re.sub(r"\s+", "", Prompt.ask("  App password / email password"))
 
     cfg = {"email": email, "password": password, "host": host, "port": port}
 
