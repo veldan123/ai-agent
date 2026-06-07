@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import os, sys, json, csv, glob, re, smtplib, ssl
+import os, sys, json, csv, glob, re, smtplib, ssl, time, random
 from email.mime.text import MIMEText
 from datetime import datetime
 
@@ -27,9 +27,25 @@ SMTP_PRESETS = {
 }
 
 
+def boot_sequence():
+    steps = [
+        "linking local AI engine (gemma3:4b)",
+        "establishing secure mail relay",
+        "loading contact interface",
+    ]
+    for step in steps:
+        with console.status(f"[dim cyan]{step}...[/dim cyan]", spinner="dots12"):
+            time.sleep(random.uniform(0.35, 0.6))
+        console.print(f"  [dim cyan]›[/dim cyan] [dim]{step}[/dim] [bold green]done[/bold green]")
+    console.print("  [bold green]✓ all systems online[/bold green]")
+    time.sleep(0.3)
+    console.print()
+
+
 def banner():
     console.clear()
     console.print()
+    boot_sequence()
     console.print(Panel(
         Align_center("📧  Auto Email Sender"),
         subtitle="AI writes the draft — you decide what gets sent",
@@ -99,12 +115,13 @@ def setup_email():
 
     cfg = {"email": email, "password": password, "host": host, "port": port}
 
-    console.print("\n  Testing connection...")
+    console.print()
     try:
-        ctx = ssl.create_default_context()
-        with smtplib.SMTP(cfg["host"], cfg["port"], timeout=15) as server:
-            server.starttls(context=ctx)
-            server.login(cfg["email"], cfg["password"])
+        with console.status("  [cyan]⚡ establishing secure connection...[/cyan]", spinner="arc"):
+            ctx = ssl.create_default_context()
+            with smtplib.SMTP(cfg["host"], cfg["port"], timeout=15) as server:
+                server.starttls(context=ctx)
+                server.login(cfg["email"], cfg["password"])
         console.print("  [bold green]✓ Connected successfully[/bold green]\n")
     except Exception as e:
         console.print(f"  [bold red]✗ Couldn't connect: {e}[/bold red]")
@@ -167,7 +184,9 @@ def pick_contacts():
         console.print(f"\n  [bold red]File not found: {path}[/bold red]\n")
         sys.exit(1)
 
-    contacts = load_contacts(path)
+    with console.status(f"  [cyan]⚡ scanning {os.path.basename(path)}...[/cyan]", spinner="dots12"):
+        time.sleep(random.uniform(0.5, 0.9))
+        contacts = load_contacts(path)
     return contacts
 
 
@@ -280,7 +299,13 @@ def main():
         console.print()
         console.rule(f"[bold]Contact {i}/{total} — {company}  [dim]<{to_email}>[/dim][/bold]", style="green")
 
-        with console.status("  [green]AI is writing a personalized draft...[/green]", spinner="dots"):
+        thinking_msg = random.choice([
+            "[green]⚡ analyzing recipient profile...[/green]",
+            "[green]⚡ composing personalized draft...[/green]",
+            "[green]⚡ tuning tone & structure...[/green]",
+            "[green]⚡ running it through the language model...[/green]",
+        ])
+        with console.status(f"  {thinking_msg}", spinner="dots12"):
             try:
                 subject, body = generate_draft(contact, goal, sender_name)
             except Exception as e:
@@ -307,8 +332,9 @@ def main():
 
             if action in ("a", "approve", ""):
                 try:
-                    send_email(cfg, to_email, subject, body)
-                    log_sent(log_path, to_email, company, subject)
+                    with console.status(f"  [cyan]⚡ transmitting to {to_email}...[/cyan]", spinner="bouncingBar"):
+                        send_email(cfg, to_email, subject, body)
+                        log_sent(log_path, to_email, company, subject)
                     console.print(f"  [bold green]✓ Sent to {to_email}[/bold green]")
                     sent += 1
                 except Exception as e:
@@ -336,6 +362,9 @@ def main():
                 return
             else:
                 console.print("  [dim]Type A, E, S, or Q[/dim]")
+
+    with console.status("  [cyan]⚡ syncing logs & closing connection...[/cyan]", spinner="dots12"):
+        time.sleep(0.6)
 
     console.print()
     console.print(Panel(
