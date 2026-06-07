@@ -10,7 +10,7 @@ from rich.prompt import Prompt
 from rich.align import Align
 from rich import box
 
-VERSION     = "1.0.0"
+VERSION     = "1.0.1"
 VERSION_URL = "https://raw.githubusercontent.com/veldan123/ai-agent/main/model_gen/version.txt"
 APP_URL     = "https://raw.githubusercontent.com/veldan123/ai-agent/main/model_gen/agent.py"
 APP_PATH    = os.path.expanduser("~/model_gen/agent.py")
@@ -40,12 +40,25 @@ def check_update():
 
 
 def find_openscad():
+    candidates = []
     found = shutil.which("openscad")
     if found:
-        return found
-    for path in OPENSCAD_PATHS:
-        if os.path.isfile(path):
+        candidates.append(found)
+    candidates.extend(OPENSCAD_PATHS)
+
+    seen = set()
+    for path in candidates:
+        if path in seen or not os.path.isfile(path):
+            continue
+        seen.add(path)
+        try:
+            # Just confirm the binary actually runs on this machine — a path
+            # existing isn't enough (e.g. wrong-architecture builds raise
+            # "Bad CPU type in executable" instead of a normal exit code).
+            subprocess.run([path, "--version"], capture_output=True, timeout=10)
             return path
+        except Exception:
+            continue
     return None
 
 
