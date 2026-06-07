@@ -38,6 +38,9 @@ if [ ! -d "/Applications/OpenSCAD.app" ] && ! command -v openscad &>/dev/null; t
     echo "  Installing OpenSCAD (3D render engine, ~200MB)..."
     brew install --cask openscad
 fi
+# macOS quarantines unsigned cask apps on install — without this, Gatekeeper
+# silently kills OpenSCAD on launch (looks like "not found" / "Bad CPU type").
+xattr -dr com.apple.quarantine /Applications/OpenSCAD*.app 2>/dev/null
 echo "  ✓ OpenSCAD ready"
 
 # ── Start Ollama ──
