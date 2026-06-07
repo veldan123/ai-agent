@@ -5,6 +5,11 @@ echo "  ╔═══════════════════════
 echo "  ║   Auto Email Sender — Mac Setup  ║"
 echo "  ╚══════════════════════════════════╝"
 echo ""
+echo "  Note: on a brand-new install this can take a few minutes."
+echo "  If something errors out partway through, just run this"
+echo "  same command again — it almost always works the 2nd time"
+echo "  (the first run does most of the heavy lifting)."
+echo ""
 
 # ── Homebrew ──
 if ! command -v brew &>/dev/null; then
@@ -32,7 +37,11 @@ echo "  ✓ Ollama ready"
 echo "  Starting Ollama..."
 pkill ollama 2>/dev/null; sleep 1
 ollama serve &>/dev/null &
-sleep 3
+echo "  Waiting for Ollama to be ready..."
+for i in $(seq 1 30); do
+    ollama list &>/dev/null && break
+    sleep 1
+done
 echo "  ✓ Ollama running"
 
 # ── AI Model ──
@@ -56,4 +65,10 @@ echo "  ✓ Ready"
 echo ""
 echo "  ✓ Done! Launching Auto Email Sender..."
 echo ""
-python3 ~/email_sender/agent.py
+python3 ~/email_sender/agent.py || {
+    echo ""
+    echo "  ⚠️  Something didn't finish cleanly on this run."
+    echo "  This is common on a first-time install — please run the"
+    echo "  install command again and it should work the second time."
+    echo ""
+}
