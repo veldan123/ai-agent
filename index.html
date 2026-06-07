@@ -120,6 +120,7 @@
     .card-finder::before  { background: radial-gradient(ellipse at top left, #1e3a6e22, transparent 60%); }
     .card-chatbot::before { background: radial-gradient(ellipse at top left, #3b1e6e22, transparent 60%); }
     .card-email::before   { background: radial-gradient(ellipse at top left, #14532d22, transparent 60%); }
+    .card-model::before   { background: radial-gradient(ellipse at top left, #0e749022, transparent 60%); }
 
     .card:hover {
       transform: translateY(-4px);
@@ -129,6 +130,7 @@
     .card-finder:hover  { border-color: #2563eb; box-shadow: 0 20px 40px rgba(37,99,235,0.15); }
     .card-chatbot:hover { border-color: #7c3aed; box-shadow: 0 20px 40px rgba(124,58,237,0.15); }
     .card-email:hover   { border-color: #16a34a; box-shadow: 0 20px 40px rgba(22,163,74,0.15); }
+    .card-model:hover   { border-color: #22d3ee; box-shadow: 0 20px 40px rgba(34,211,238,0.15); }
 
     .card-icon {
       width: 56px; height: 56px;
@@ -139,6 +141,7 @@
     .card-finder  .card-icon { background: linear-gradient(135deg, #1d4ed8, #2563eb); }
     .card-chatbot .card-icon { background: linear-gradient(135deg, #6d28d9, #7c3aed); }
     .card-email   .card-icon { background: linear-gradient(135deg, #15803d, #16a34a); }
+    .card-model   .card-icon { background: linear-gradient(135deg, #0e7490, #22d3ee); }
 
     .card-tag {
       display: inline-block;
@@ -154,6 +157,7 @@
     .card-finder  .card-tag { background: #1e3a6e; color: #60a5fa; }
     .card-chatbot .card-tag { background: #2e1a5e; color: #a78bfa; }
     .card-email   .card-tag { background: #14532d; color: #4ade80; }
+    .card-model   .card-tag { background: #0e3a4a; color: #22d3ee; }
 
     .card h2 {
       font-size: 1.4rem;
@@ -189,6 +193,7 @@
     .card-finder  .card-feature-dot { background: #2563eb; }
     .card-chatbot .card-feature-dot { background: #7c3aed; }
     .card-email   .card-feature-dot { background: #16a34a; }
+    .card-model   .card-feature-dot { background: #22d3ee; }
 
     .card-cta {
       display: flex;
@@ -215,6 +220,7 @@
     .card-finder  .card-btn { background: linear-gradient(135deg, #1d4ed8, #2563eb); color: #fff; }
     .card-chatbot .card-btn { background: linear-gradient(135deg, #6d28d9, #7c3aed); color: #fff; }
     .card-email   .card-btn { background: linear-gradient(135deg, #15803d, #16a34a); color: #fff; }
+    .card-model   .card-btn { background: linear-gradient(135deg, #0e7490, #22d3ee); color: #04222b; }
 
     .card-free {
       font-size: 12px;
@@ -304,6 +310,26 @@
         <div class="card-feature"><div class="card-feature-dot"></div>AI-written, personalized drafts</div>
         <div class="card-feature"><div class="card-feature-dot"></div>You approve every send</div>
         <div class="card-feature"><div class="card-feature-dot"></div>Works with Client Finder's CSVs</div>
+        <div class="card-feature"><div class="card-feature-dot"></div>Mac & Windows</div>
+      </div>
+      <div class="card-cta">
+        <div class="card-btn">⬇ Download</div>
+        <div class="card-free">✦ Free</div>
+      </div>
+    </a>
+
+    <!-- 3D Model Generator -->
+    <a class="card card-model" href="model-setup.html">
+      <div>
+        <div class="card-tag">Design & Print</div>
+      </div>
+      <div class="card-icon">🧊</div>
+      <h2>3D Model Generator</h2>
+      <p>Describe an object — AI designs it as CAD code and exports a ready-to-print STL file you can send straight to a 3D printer.</p>
+      <div class="card-features">
+        <div class="card-feature"><div class="card-feature-dot"></div>Prompt → 3D model → STL</div>
+        <div class="card-feature"><div class="card-feature-dot"></div>Self-corrects render errors</div>
+        <div class="card-feature"><div class="card-feature-dot"></div>Editable CAD source included</div>
         <div class="card-feature"><div class="card-feature-dot"></div>Mac & Windows</div>
       </div>
       <div class="card-cta">
