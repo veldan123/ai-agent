@@ -93,7 +93,8 @@ def setup_email():
         ))
         console.print()
 
-    password = Prompt.ask("  App password / email password", password=True).strip()
+    console.print("  [dim](What you type/paste will be visible — that's normal here, app passwords are safe to show)[/dim]")
+    password = Prompt.ask("  App password / email password").strip()
 
     cfg = {"email": email, "password": password, "host": host, "port": port}
 
